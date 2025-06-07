@@ -38,8 +38,10 @@ func main() {
 		fmt.Println("creating a gemini client failed")
 	}
 	fmt.Println("new gemini client initialized")
+	fmt.Println()
 
-	reader := bufio.NewReader(os.Stdin) // read text from the terminal
+	// make a reader to read inputs from the stdin
+	reader := bufio.NewReader(os.Stdin)
 
 	for {
 		fmt.Print("User: ")
@@ -56,13 +58,16 @@ func main() {
 		res, err := client.Models.GenerateContent(
 			ctx,
 			"gemini-2.0-flash",
-			genai.Text(fmt.Sprintf(string(userInput))),
+			genai.Text(fmt.Sprint(userInput)),
 			nil,
 		)
 		if err != nil {
 			fmt.Println("an error occured when repsonding, please try again!")
 			continue
 		}
+
+		// candiates are the differenct responses the LLM redponds with
+		// res.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
 		if len(res.Candidates) == 0 {
 			fmt.Println("no response candiate found, issue with the model or something.... blah blah blah")
 			if res.PromptFeedback != nil && len(res.PromptFeedback.BlockReason) > 0 {
@@ -71,8 +76,9 @@ func main() {
 			continue
 		}
 
+		// create a string slice to hold the reponse
 		var botReponse strings.Builder
-		for _, _ = range res.Candidates[0].Content.Parts {
+		for _ = range res.Candidates[0].Content.Parts {
 			botReponse.WriteString(string(res.Text()))
 		}
 		fmt.Printf("bot: %s\n", botReponse.String())
