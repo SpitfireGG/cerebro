@@ -4,10 +4,9 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"google.golang.org/genai"
 	"os"
 	"strings"
-
-	"google.golang.org/genai"
 )
 
 func GenerateContent(apiKey, prompt string) (string, error) {
@@ -59,12 +58,10 @@ func GenerateContent(apiKey, prompt string) (string, error) {
 			}
 			continue
 		}
-
 		// create a string slice to hold the reponse
 		for _ = range res.Candidates[0].Content.Parts {
 			botReponse.WriteString(string(res.Text()))
 		}
-
 	}
 	return botReponse.String(), nil
 }
