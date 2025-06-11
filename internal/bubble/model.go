@@ -31,9 +31,10 @@ type Model struct {
 	responseWidth  uint8
 	promptHeight   uint8
 	promptWidth    uint8
+	api_key 	string
 }
 
-func InitialModel() Model {
+func InitialModel(apiKey string) Model {
 
 	t1 := textinput.New()
 	t1.Placeholder = "Prompt the LLM into doing something..."
@@ -65,7 +66,7 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) GenerateReponse(prompt string) tea.Cmd {
 	return func() tea.Msg {
-		resp, err := api.GenerateContent("AIzaSyAPTZeU_eEPYcEWihYziBFxXa0ayV9dGPM", prompt)
+		resp, err := api.GenerateContent(m.api_key, prompt)
 		return LLMreponseMsg{
 			response: resp,
 			err:      err,
