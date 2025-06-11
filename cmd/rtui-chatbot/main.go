@@ -1,15 +1,13 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"log"
 	"os"
-	"strings"
 
-	"bufio"
-
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/joho/godotenv"
-	"google.golang.org/genai"
+	"github.com/spitfiregg/RTUI_chatbot/internal/bubble"
 )
 
 // TODO: add feat:  make this shit a TUI program for better interactions ( set buffers for inputs)
@@ -18,7 +16,8 @@ import (
 
 func main() {
 
-	err := godotenv.Load()
+	// load the environment variable
+	err := godotenv.Load("../../.env")
 	if err != nil {
 		fmt.Println("could not find .env")
 	}
@@ -28,5 +27,15 @@ func main() {
 		fmt.Println("key was not set or found")
 		os.Exit(1)
 	}
+
+	model := bubble.InitialModel()
+	program := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
+	if _, err := program.Run(); err != nil {
+		log.Fatalf("something went wrong: %v", err)
+		os.Exit(1)
+	}
+
+	/// testing
+	/* 	api.GenerateContent("AIzaSyAPTZeU_eEPYcEWihYziBFxXa0ayV9dGPM", "how are you geminnni????") */
 
 }
