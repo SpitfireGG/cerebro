@@ -2,11 +2,18 @@ package bubble
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/spitfiregg/RTUI_chatbot/internal/debug"
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var cmd tea.Cmd
+
+	Dmodel := debug.Debug{
+		DumpFile: m.DebugModel.Dump,
+	}
+
+	Dmodel.WriteLog(msg)
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
