@@ -18,7 +18,7 @@ import (
 func main() {
 
 	// load the environment variable
-	err := godotenv.Load("../../.env")
+	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("could not find .env")
 	}
@@ -30,16 +30,16 @@ func main() {
 	}
 
 	model := bubble.InitialModel(gemini_key)
-	dbgModel := debug.DebugModel{Model: model}
 
-	dbgFilename := "debug.log"
-	dbgModel.EnterDebug(dbgFilename)
+	var dbgModel debug.Debug
+	dbgModel.EnterDebug("", "debug.log")
 
-	defer dbgModel.CloseDebug()
+	model.Dump = dbgModel.DumpFile
 
 	program := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	if _, err := program.Run(); err != nil {
 		log.Fatalf("something went wrong: %v", err)
 		os.Exit(1)
 	}
+	dbgModel.CloseDebug()
 }
