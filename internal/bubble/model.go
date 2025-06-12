@@ -1,6 +1,8 @@
 package bubble
 
 import (
+	"os"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -31,13 +33,14 @@ type Model struct {
 	responseWidth  uint8
 	promptHeight   uint8
 	promptWidth    uint8
-	api_key 	string
+	api_key        string
+	Dump           *os.File
 }
 
 func InitialModel(apiKey string) Model {
 
 	t1 := textinput.New()
-	t1.Placeholder = "Prompt the LLM into doing something..."
+	t1.Placeholder = "Talk to Gemini"
 	t1.Focus()
 	t1.Cursor.Blink = true
 	t1.CharLimit = 512
@@ -57,6 +60,7 @@ func InitialModel(apiKey string) Model {
 		responseWidth:  0,
 		promptHeight:   0,
 		promptWidth:    0,
+		Dump:           nil,
 	}
 }
 
@@ -72,5 +76,4 @@ func (m Model) GenerateReponse(prompt string) tea.Cmd {
 			err:      err,
 		}
 	}
-
 }
