@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/joho/godotenv"
 	"github.com/spitfiregg/RTUI_chatbot/internal/bubble"
+	"github.com/spitfiregg/RTUI_chatbot/internal/debug"
 )
 
 // TODO: add feat:  make this shit a TUI program for better interactions ( set buffers for inputs)
@@ -28,14 +29,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	model := bubble.InitialModel()
+	model := bubble.InitialModel(gemini_key)
+	dbgModel := debug.DebugModel{Model: model}
+
+	dbgFilename := "debug.log"
+	dbgModel.EnterDebug(dbgFilename)
+
+	defer dbgModel.CloseDebug()
+
 	program := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	if _, err := program.Run(); err != nil {
 		log.Fatalf("something went wrong: %v", err)
 		os.Exit(1)
 	}
-
-	/// testing
-	/* 	api.GenerateContent("AIzaSyAPTZeU_eEPYcEWihYziBFxXa0ayV9dGPM", "how are you geminnni????") */
-
 }
