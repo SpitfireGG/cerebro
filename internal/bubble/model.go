@@ -23,6 +23,10 @@ type LLMreponseMsg struct {
 	err      error
 }
 
+type DebugModel struct {
+	Dump *os.File
+}
+
 type Model struct {
 	textIP         textinput.Model
 	viewPort       viewport.Model
@@ -34,7 +38,7 @@ type Model struct {
 	promptHeight   uint8
 	promptWidth    uint8
 	api_key        string
-	Dump           *os.File
+	DebugModel
 }
 
 func InitialModel(apiKey string) Model {
@@ -60,7 +64,8 @@ func InitialModel(apiKey string) Model {
 		responseWidth:  0,
 		promptHeight:   0,
 		promptWidth:    0,
-		Dump:           nil,
+		api_key:        apiKey,
+		DebugModel:     DebugModel{},
 	}
 }
 
