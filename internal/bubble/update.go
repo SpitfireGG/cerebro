@@ -1,12 +1,12 @@
 package bubble
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	tea "github.com/charmbracelet/bubbletea"
+)
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var cmd tea.Cmd
-
-	/* 	var cmds []tea.Cmd */
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:

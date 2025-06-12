@@ -18,7 +18,7 @@ func (m Model) View() string {
 	}
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		ResponseStyle.Render("🤖 LLM Chat - Gemini 2.0 Flash"),
+		ResponseStyle.Render("Gemini-2.0 flash"),
 		"",
 		m.viewPort.View(),
 		"",
