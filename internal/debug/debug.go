@@ -7,48 +7,40 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/spitfiregg/RTUI_chatbot/internal/bubble"
 )
 
-
-type DebugModel struct {
-	bubble.Model
-	dumpFile *os.File
+type Debug struct {
+	DumpFile *os.File
 }
 
-func (dbg *DebugModel) EnterDebug(filename string) {
+func (dbg *Debug) EnterDebug(dumpFile string, filename string) {
 
 	if _, ok := os.LookupEnv("DEBUG"); ok {
 		var err error
 
-		dbg.dumpFile, err = os.OpenFile(filename, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+		dbg.DumpFile, err = os.OpenFile(filename, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
 		if err != nil {
 			log.Fatalf("ran into some error when opening the file: %v", err)
 			os.Exit(1)
 		}
 		fmt.Printf("Debug has been logged into file %s\n", filename)
-	}else{
-		dbg.dumpFile = nil
+	} else {
+		dbg.DumpFile = nil
 	}
 }
 
-
-
-func (dbg *DebugModel) WriteLog(msg tea.Msg) {
-	if dbg.dumpFile != nil {
-		spew.Dump(dbg.dumpFile, msg)
+func (dbg *Debug) WriteLog(msg tea.Msg) {
+	if dbg.DumpFile != nil {
+		spew.Fdump(dbg.DumpFile, msg)
 	}
 }
 
-func (dm *DebugModel) CloseDebug() {
-	if dm.dumpFile != nil {
-		err := dm.dumpFile.Close()
+func (dm *Debug) CloseDebug() {
+	if dm.DumpFile != nil {
+		err := dm.DumpFile.Close()
 		if err != nil {
 			log.Printf("Error closing debug dump file: %v", err)
 		}
-		dm.dumpFile = nil 
+		dm.DumpFile = nil
 	}
 }
-
-
-
