@@ -5,8 +5,6 @@ import (
 	"github.com/spitfiregg/RTUI_chatbot/internal/debug"
 )
 
-// BUG: input is not being updated and key mappings wont work
-
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	Dmodel := debug.Debug{
 		DumpFile: m.DebugModel.Dump,
@@ -14,26 +12,56 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	Dmodel.WriteLog(msg)
 
-	var cmd tea.Cmd
 	var cmds []tea.Cmd
+	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
-
 	case tea.WindowSizeMsg:
-		m.handleResize(msg)
+		m.width = msg.Width
+		m.height = msg.Height
+
+		m.viewPort.Width = msg.Width
+		m.viewPort.Height = msg.Height - 6
+
+		m.textInput.Width = msg.Width - 4
 
 	case tea.KeyMsg:
-		_, cmd = m.handleKeyPress(msg)
-		cmds = append(cmds, cmd)
+		if m.isLLMthinking && msg.String() != "ctrl+c" && msg.String() != "q" {
+			break
+		}
+		switch msg.String() {
+		case "q", "Q", "quit", "ctrl-c":
+			return m, tea.Quit
 
+		case "enter":
+			if m.textInput.Value() != "" && !m.isLLMthinking {
+				prompt := m.textInput.Value()
+				m.isLLMthinking = true
+
+				m.chat.AddUserMessage(prompt)
+				m.updateViewportContent()
+
+				m.textInput.SetValue("")
+
+				cmd = m.GenerateReponse(prompt)
+				cmds = append(cmds, cmd)
+			}
+		}
 	case LLMreponseMsg:
-		cmd = m.handleLLMResponse(msg)
-		cmds = append(cmds, cmd)
+		m.isLLMthinking = false
+		if msg.err != nil {
+			m.chat.AddSystemMessage("Error: " + msg.err.Error())
+		} else {
+			m.chat.AddAssistantMessage(msg.response)
+		}
+		m.updateViewportContent()
+		m.viewPort.GotoBottom()
 	}
-	// Update UI components
-	var inputCmd tea.Cmd
-	m.ui.textIP, inputCmd = m.ui.textIP.Update(msg)
-	cmds = append(cmds, inputCmd)
+	m.textInput, cmd = m.textInput.Update(msg)
+	cmds = append(cmds, cmd)
+
+	m.viewPort, cmd = m.viewPort.Update(msg)
+	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
 
