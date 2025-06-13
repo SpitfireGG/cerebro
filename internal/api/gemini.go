@@ -1,12 +1,11 @@
 package api
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"google.golang.org/genai"
-	"os"
 	"strings"
+
+	"google.golang.org/genai"
 )
 
 func GenerateContent(apiKey, prompt string) (string, error) {
@@ -16,52 +15,33 @@ func GenerateContent(apiKey, prompt string) (string, error) {
 		Backend: genai.BackendGeminiAPI,
 	})
 	if err != nil {
-		fmt.Println("creating a gemini client failed")
+		return "", fmt.Errorf("creating a gemini client failed: %w", err)
 	}
-	fmt.Println("new gemini client initialized")
-	fmt.Println()
+	defer client.ClientConfig().HTTPClient.CloseIdleConnections() // Critical: Clean up resources
 
-	// make a reader to read inputs from the stdin
-	reader := bufio.NewReader(os.Stdin)
+	res, err := client.Models.GenerateContent(
+		ctx,
+		"gemini-2.0-flash",
+		genai.Text(prompt),
+		nil,
+	)
+	if err != nil {
+		return "", fmt.Errorf("an error occurred when responding: %w", err)
+	}
 
-	var botReponse strings.Builder
-
-	for {
-		fmt.Print("User: ")
-		userInput, _ := reader.ReadString('\n')
-
-		if strings.ToLower(userInput) == "q" || strings.ToLower(userInput) == "quit" {
-			fmt.Println("exiting...")
-			break
-		}
-		if userInput == "" {
-			fmt.Println("please try entering something")
-			continue
-		}
-		res, err := client.Models.GenerateContent(
-			ctx,
-			"gemini-2.0-flash",
-			genai.Text(fmt.Sprint(userInput)),
-			nil,
-		)
-		if err != nil {
-			fmt.Println("an error occured when repsonding, please try again!")
-			continue
-		}
-
+	if len(res.Candidates) == 0 {
 		// candiates are the differenct responses the LLM redponds with
 		// res.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
-		if len(res.Candidates) == 0 {
-			fmt.Println("no response candiate found, issue with the model or something.... blah blah blah")
-			if res.PromptFeedback != nil && len(res.PromptFeedback.BlockReason) > 0 {
-				fmt.Printf("due to voilation the bot was blocked\n\n err: %v", res.PromptFeedback.BlockReason)
-			}
-			continue
+		if res.PromptFeedback != nil && len(res.PromptFeedback.BlockReason) > 0 {
+			return "", fmt.Errorf("no response candidate found, bot was blocked due to violation: %v", res.PromptFeedback.BlockReason)
 		}
-		// create a string slice to hold the reponse
-		for _ = range res.Candidates[0].Content.Parts {
-			botReponse.WriteString(string(res.Text()))
-		}
+		return "", fmt.Errorf("no response candidate found, issue with the model or something")
 	}
-	return botReponse.String(), nil
+
+	var botResponse strings.Builder
+	for _, part := range res.Candidates[0].Content.Parts {
+		botResponse.WriteString(part.Text)
+	}
+
+	return botResponse.String(), nil
 }
