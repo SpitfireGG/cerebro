@@ -19,16 +19,15 @@ const (
 
 // define the main program state
 type UI struct {
-	textIP   textinput.Model
-	viewPort viewport.Model
-	height   int
-	width    int
+	textInput textinput.Model
+	viewPort  viewport.Model
+	height    int
+	width     int
 }
 
 type App struct {
-	ui      *UI
-	chat    *chat.Session
-	api_key string
+	ui   *UI
+	chat *chat.Session
 }
 
 type LLMreponseMsg struct {
@@ -41,9 +40,8 @@ type DebugModel struct {
 }
 
 type Model struct {
-	LLMreponse    string
-	Userprompt    string
 	isLLMthinking bool
+	api_key       string
 
 	//embed the defined structs into the main Model
 
@@ -53,30 +51,34 @@ type Model struct {
 	DebugModel
 }
 
+func TextInputHandler() textinput.Model {
+	ti := textinput.New()
+	ti.Placeholder = "Talk to Gemini"
+	ti.Focus()
+	ti.Cursor.Blink = true
+	ti.CharLimit = 512
+	ti.Width = 80
+	return ti
+
+}
+
 func InitialModel(apiKey string) Model {
 
-	t1 := textinput.New()
-	t1.Placeholder = "Talk to Gemini"
-	t1.Focus()
-	t1.Cursor.Blink = true
-	t1.CharLimit = 512
-	t1.Width = 80
-
 	// jump straight to prompting the model
+	vp := viewport.New(vpWidth, vpHeight)
+	vp.SetContent("welcome to the Playground...")
 
 	return Model{
-		LLMreponse:    "",    // nil initially
-		Userprompt:    "",    // nil initially
 		isLLMthinking: false, // initially set the model thinking to be false
+		api_key:       apiKey,
 
 		UI: UI{
-			textIP:   t1,
-			viewPort: viewport.New(vpWidth, vpHeight),
+			textInput: TextInputHandler(),
+			viewPort:  vp,
 		},
 		App: App{
-			ui:      &UI{},
-			chat:    &chat.Session{},
-			api_key: apiKey,
+			ui:   &UI{},
+			chat: chat.NewSession(), // default to new session
 		},
 		LLMreponseMsg: LLMreponseMsg{
 			response: "This is an initial test reponse",
