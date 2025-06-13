@@ -5,31 +5,36 @@ import (
 	"github.com/spitfiregg/RTUI_chatbot/internal/debug"
 )
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+// BUG: input is not being updated and key mappings wont work
 
-	var cmd tea.Cmd
-
+func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	Dmodel := debug.Debug{
 		DumpFile: m.DebugModel.Dump,
 	}
 
 	Dmodel.WriteLog(msg)
 
+	var cmd tea.Cmd
+	var cmds []tea.Cmd
+
 	switch msg := msg.(type) {
+
 	case tea.WindowSizeMsg:
+		m.handleResize(msg)
 
 	case tea.KeyMsg:
-		switch msg.String() {
+		_, cmd = m.handleKeyPress(msg)
+		cmds = append(cmds, cmd)
 
-		case "q", "quit", "ctrl-c":
-			return m, tea.Quit
-
-		case "enter":
-			if m.isLLMthinking {
-				break
-			}
-		}
+	case LLMreponseMsg:
+		cmd = m.handleLLMResponse(msg)
+		cmds = append(cmds, cmd)
 	}
-	m.textIP, cmd = m.textIP.Update(msg)
-	return m, cmd
+	// Update UI components
+	var inputCmd tea.Cmd
+	m.ui.textIP, inputCmd = m.ui.textIP.Update(msg)
+	cmds = append(cmds, inputCmd)
+
+	return m, tea.Batch(cmds...)
+
 }
