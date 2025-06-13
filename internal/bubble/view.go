@@ -1,29 +1,20 @@
 package bubble
 
 import (
+	"fmt"
 	"strings"
-
-	"github.com/charmbracelet/lipgloss"
 )
-
-var console strings.Builder
 
 func (m Model) View() string {
 
-	var status string
+	status := "Gemini ready for prompt..."
 	if m.isLLMthinking {
-		status = ResponseStyle.Render("model is thinking....")
-	} else {
-		status = ResponseStyle.Render("ready for the prompt...")
+		status = "Thinking..."
 	}
-	return lipgloss.JoinVertical(
-		lipgloss.Left,
-		ResponseStyle.Render("Gemini-2.0 flash"),
-		"",
+	return fmt.Sprintf("%s\n%s\n%s\n%s",
 		m.viewPort.View(),
-		"",
+		strings.Repeat("─", m.width),
 		status,
-		m.textIP.View(),
-		ResponseStyle.Render("Commands: 'enter' to send • 'ctrl+l' to clear • 'q' to quit"),
+		m.textInput.View(),
 	)
 }
