@@ -59,7 +59,6 @@ func TextInputHandler() textinput.Model {
 	ti.CharLimit = 512
 	ti.Width = 80
 	return ti
-
 }
 
 func InitialModel(apiKey string) Model {
