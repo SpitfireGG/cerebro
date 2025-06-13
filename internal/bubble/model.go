@@ -1,12 +1,11 @@
 package bubble
 
 import (
-	"os"
-
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/spitfiregg/RTUI_chatbot/internal/api"
+	"github.com/spitfiregg/RTUI_chatbot/internal/bubble/chat"
+	"os"
 )
 
 // TODO: make struct member for more models ( add more models )
@@ -14,9 +13,23 @@ import (
 
 // Viewport dimension
 const (
-	vpHeight = 80
-	vpWidth  = 20
+	vpHeight = 40
+	vpWidth  = 120
 )
+
+// define the main program state
+type UI struct {
+	textIP   textinput.Model
+	viewPort viewport.Model
+	height   int
+	width    int
+}
+
+type App struct {
+	ui      *UI
+	chat    *chat.Session
+	api_key string
+}
 
 type LLMreponseMsg struct {
 	response string
@@ -28,16 +41,15 @@ type DebugModel struct {
 }
 
 type Model struct {
-	textIP         textinput.Model
-	viewPort       viewport.Model
-	LLMreponse     string
-	Userprompt     string
-	isLLMthinking  bool
-	responseHeight uint8
-	responseWidth  uint8
-	promptHeight   uint8
-	promptWidth    uint8
-	api_key        string
+	LLMreponse    string
+	Userprompt    string
+	isLLMthinking bool
+
+	//embed the defined structs into the main Model
+
+	App
+	UI
+	LLMreponseMsg
 	DebugModel
 }
 
@@ -50,35 +62,30 @@ func InitialModel(apiKey string) Model {
 	t1.CharLimit = 512
 	t1.Width = 80
 
-	vp := viewport.New(vpWidth, vpHeight)
-
 	// jump straight to prompting the model
 
 	return Model{
-		textIP:         t1,
-		viewPort:       vp,
-		LLMreponse:     "",    // nil initially
-		Userprompt:     "",    // nil initially
-		isLLMthinking:  false, // initially set the model thinking to be false
-		responseHeight: 0,
-		responseWidth:  0,
-		promptHeight:   0,
-		promptWidth:    0,
-		api_key:        apiKey,
-		DebugModel:     DebugModel{},
+		LLMreponse:    "",    // nil initially
+		Userprompt:    "",    // nil initially
+		isLLMthinking: false, // initially set the model thinking to be false
+
+		UI: UI{
+			textIP:   t1,
+			viewPort: viewport.New(vpWidth, vpHeight),
+		},
+		App: App{
+			ui:      &UI{},
+			chat:    &chat.Session{},
+			api_key: apiKey,
+		},
+		LLMreponseMsg: LLMreponseMsg{
+			response: "This is an initial test reponse",
+			err:      nil,
+		},
+		DebugModel: DebugModel{},
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return (textinput.Blink)
-}
-
-func (m Model) GenerateReponse(prompt string) tea.Cmd {
-	return func() tea.Msg {
-		resp, err := api.GenerateContent(m.api_key, prompt)
-		return LLMreponseMsg{
-			response: resp,
-			err:      err,
-		}
-	}
+	return tea.Batch(textinput.Blink)
 }
