@@ -5,7 +5,9 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spitfiregg/RTUI_chatbot/internal/bubble/chat"
+	"github.com/spitfiregg/RTUI_chatbot/window"
 	"os"
+	"time"
 )
 
 // TODO: make struct member for more models ( add more models )
@@ -15,6 +17,15 @@ import (
 const (
 	vpHeight = 40
 	vpWidth  = 120
+)
+
+type State int
+
+const (
+	GreetWindow State = iota
+	MainWindow
+	LLMwindow
+	SettingsWindow
 )
 
 // define the main program state
@@ -43,13 +54,19 @@ type Model struct {
 	isLLMthinking bool
 	api_key       string
 
-	//embed the defined structs into the main Model
+	// for window selection
+	currentState      State
+	LLMSelectorWindow window.LLMmodel
+	selectedLLM       string
 
+	//embed the defined structs into the main Model
 	App
 	UI
 	LLMreponseMsg
 	DebugModel
 }
+
+type TransitionToMain struct{}
 
 func TextInputHandler() textinput.Model {
 	ti := textinput.New()
@@ -68,25 +85,42 @@ func InitialModel(apiKey string) Model {
 	vp.SetContent("welcome to the Playground...")
 
 	return Model{
-		isLLMthinking: false, // initially set the model thinking to be false
-		api_key:       apiKey,
 
+		currentState:      GreetWindow,
+		LLMSelectorWindow: window.NewModel(),
+		isLLMthinking:     false, // initially set the model thinking to be false
+		api_key:           apiKey,
+
+		// the whole ui of the program
 		UI: UI{
 			textInput: TextInputHandler(),
 			viewPort:  vp,
 		},
+
+		// the app itself
 		App: App{
 			ui:   &UI{},
 			chat: chat.NewSession(), // default to new session
 		},
+
+		// response from the LLM
 		LLMreponseMsg: LLMreponseMsg{
 			response: "This is an initial test reponse",
 			err:      nil,
 		},
+
+		// debugging
 		DebugModel: DebugModel{},
 	}
 }
 
+func Transition(d time.Duration) tea.Cmd {
+	return func() tea.Msg {
+		time.Sleep(d)
+		return TransitionToMain{}
+	}
+}
+
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(textinput.Blink)
+	return tea.Batch(textinput.Blink, m.LLMSelectorWindow.Init())
 }
