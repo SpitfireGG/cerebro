@@ -22,13 +22,11 @@ func main() {
 	if err != nil {
 		fmt.Println("could not find .env")
 	}
-
 	gemini_key := os.Getenv("GEMINI_API_KEY")
 	if gemini_key == "" {
 		fmt.Println("key was not set or found")
 		os.Exit(1)
 	}
-
 	model := bubble.InitialModel(gemini_key)
 
 	var dbgModel debug.Debug
@@ -36,7 +34,7 @@ func main() {
 
 	model.Dump = dbgModel.DumpFile
 
-	program := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
+	program := tea.NewProgram(&model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	if _, err := program.Run(); err != nil {
 		log.Fatalf("something went wrong: %v", err)
 		os.Exit(1)
