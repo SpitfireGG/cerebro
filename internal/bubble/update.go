@@ -3,9 +3,8 @@ package bubble
 import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/spitfiregg/RTUI_chatbot/internal/debug"
-	"github.com/spitfiregg/RTUI_chatbot/window"
-	"time"
+	"github.com/spitfiregg/garlic/internal/debug"
+	"github.com/spitfiregg/garlic/window"
 )
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -55,7 +54,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m.currentState {
 
 	case GreetWindow:
-		Transition(time.Second * 3)
+		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "enter" {
+			m.currentState = MainWindow
+		}
 
 	case MainWindow:
 		var newTableModel tea.Model
@@ -64,12 +65,10 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 	case LLMwindow:
-		// If the model is thinking, don't process any input
 		if m.isLLMthinking {
 			return m, nil
 		}
 
-		// Handle 'enter' to send the prompt
 		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "enter" {
 			if m.textInput.Value() != "" {
 				prompt := m.textInput.Value()
@@ -82,13 +81,11 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				cmds = append(cmds, cmd)
 			}
 		} else {
-			// updathe the text input with the user's typing
 			m.textInput, cmd = m.textInput.Update(msg)
 			cmds = append(cmds, cmd)
 		}
 	}
 
-	// always update the viewport for scrolling
 	m.viewPort, cmd = m.viewPort.Update(msg)
 	cmds = append(cmds, cmd)
 
