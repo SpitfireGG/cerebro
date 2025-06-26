@@ -4,8 +4,8 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/spitfiregg/RTUI_chatbot/internal/bubble/chat"
-	"github.com/spitfiregg/RTUI_chatbot/window"
+	"github.com/spitfiregg/garlic/internal/bubble/chat"
+	"github.com/spitfiregg/garlic/window"
 	"os"
 	"time"
 )
@@ -122,5 +122,5 @@ func Transition(d time.Duration) tea.Cmd {
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(textinput.Blink, m.LLMSelectorWindow.Init())
+	return tea.Batch(textinput.Blink)
 }
