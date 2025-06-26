@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/glamour"
 	"google.golang.org/genai"
 )
 
@@ -43,5 +44,12 @@ func GenerateContent(apiKey, prompt string) (string, error) {
 		botResponse.WriteString(part.Text)
 	}
 
-	return botResponse.String(), nil
+	r, _ := glamour.NewTermRenderer(
+		glamour.WithStandardStyle("dark"),
+		glamour.WithWordWrap(120),
+	)
+
+	renderedResponse, err := r.Render(botResponse.String())
+
+	return renderedResponse, nil
 }
