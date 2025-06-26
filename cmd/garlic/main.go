@@ -7,8 +7,8 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/joho/godotenv"
-	"github.com/spitfiregg/RTUI_chatbot/internal/bubble"
-	"github.com/spitfiregg/RTUI_chatbot/internal/debug"
+	"github.com/spitfiregg/garlic/internal/bubble"
+	"github.com/spitfiregg/garlic/internal/debug"
 )
 
 // TODO: add feat:  make this shit a TUI program for better interactions ( set buffers for inputs)
