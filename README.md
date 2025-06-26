@@ -1,4 +1,4 @@
-## RTUI_chatbot
+## garlic
 --- 
 
-This is my fun little TUI project in GO for interacting with LLM models in the terminal
+This is my fun little tui project in GO for interacting with LLM models in the terminal
