@@ -22,10 +22,6 @@ type Greeter struct {
 	Greet string
 }
 
-func GreetUser() Greeter {
-	return Greeter{Greet: "welcome to the playground user\n"}
-}
-
 func NewModel() LLMmodel {
 	columns := []table.Column{
 		{Title: "Id", Width: 4},
