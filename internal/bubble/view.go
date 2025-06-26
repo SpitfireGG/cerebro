@@ -7,8 +7,6 @@ import (
 )
 
 func (m Model) View() string {
-	// Gre := window.Greeter{}
-
 	switch m.currentState {
 	case GreetWindow:
 
