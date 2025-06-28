@@ -1,13 +1,15 @@
 package bubble
 
 import (
+	"os"
+	"time"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	api "github.com/spitfiregg/garlic/internal/api/gemini"
 	"github.com/spitfiregg/garlic/internal/bubble/chat"
 	"github.com/spitfiregg/garlic/window"
-	"os"
-	"time"
 )
 
 // TODO: make struct member for more models ( add more models )
@@ -78,7 +80,7 @@ func TextInputHandler() textinput.Model {
 	return ti
 }
 
-func InitialModel(apiKey string) Model {
+func InitialModel(config *api.AppConfig) Model {
 
 	// jump straight to prompting the model
 	vp := viewport.New(vpWidth, vpHeight)
@@ -89,7 +91,7 @@ func InitialModel(apiKey string) Model {
 		currentState:      GreetWindow,
 		LLMSelectorWindow: window.NewModel(),
 		isLLMthinking:     false, // initially set the model thinking to be false
-		api_key:           apiKey,
+		api_key:           config.GeminiDefault.ApiKey,
 
 		// the whole ui of the program
 		UI: UI{
