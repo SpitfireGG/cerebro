@@ -1,0 +1,9 @@
+# phewwwwwwwwwwww
+.env
+
+# ignore the log files
+debug.log
+gemini_capture.pcap
+gemini_req_dump.log
+http_req_dump_gemini.log
+
