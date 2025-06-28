@@ -7,13 +7,12 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/joho/godotenv"
+	api "github.com/spitfiregg/garlic/internal/api/gemini"
 	"github.com/spitfiregg/garlic/internal/bubble"
 	"github.com/spitfiregg/garlic/internal/debug"
 )
 
-// TODO: add feat:  make this shit a TUI program for better interactions ( set buffers for inputs)
 // TODO: add feat:  initiate multiple reponses with concurrency
-// TODO: add feat: syntax/keywords highlighting for better readability ( parsing tokens )
 
 func main() {
 
@@ -27,7 +26,9 @@ func main() {
 		fmt.Println("key was not set or found")
 		os.Exit(1)
 	}
-	model := bubble.InitialModel(gemini_key)
+
+	appCfg := api.NewDefaultAppConfig(gemini_key)
+	model := bubble.InitialModel(appCfg)
 
 	var dbgModel debug.Debug
 	dbgModel.EnterDebug("", "debug.log")
