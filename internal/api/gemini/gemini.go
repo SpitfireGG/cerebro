@@ -1,97 +1,104 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"log"
+	"os"
 	"strings"
+
+	"net/http"
+	"net/http/httputil"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/spitfiregg/garlic/internal/config"
 	"google.golang.org/genai"
 )
 
-type ClientWrapper struct {
-	base_client   *genai.Client
-	defaultConfig *config.GeminiConfig
+type LogTransport struct {
+	RoundTripper http.RoundTripper
+}
+
+func (lt *LogTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+
+	Df, err := os.Create("gemini_req_dump.log")
+	if err != nil {
+		log.Printf("Error creating gemini_req_dump.log: %v", err)
+		return lt.RoundTripper.RoundTrip(req)
+	}
+
+	requestDump, err := httputil.DumpRequestOut(req, true)
+	if err != nil {
+		log.Printf("Error dump request: %v", err)
+	}
+
+	httpRequestDumpFile, err := os.OpenFile("http_req_dump_gemini.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	if err != nil {
+		log.Printf("Error http dump request failed: %v", err)
+	} else {
+		httpRequestDumpFile.WriteString(fmt.Sprintf("--- %s Request to %s ---\n\n", req.Method, req.URL.String()))
+		httpRequestDumpFile.Write(requestDump)
+		httpRequestDumpFile.WriteString("\n--- End Request ---\n\n")
+	}
+
+	if req.Body != nil {
+		bodyBytes, err := io.ReadAll(req.Body)
+		if err != nil {
+			log.Printf("Error reading request body for logging: %v", err)
+		} else {
+			_, writeErr := Df.Write(bodyBytes)
+			if writeErr != nil {
+				log.Printf("Error writing to gemini_req_dump: %v", writeErr)
+			}
+
+			_, writeErr = Df.WriteString("\n")
+			if writeErr != nil {
+				log.Printf("Error writing newline to gemini_req_dump.log: %v", writeErr)
+			}
+		}
+		req.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	}
+	return lt.RoundTripper.RoundTrip(req)
 }
 
 // initialize a new Gemini client
-func NewGeminiClient(appCfg *config.AppConfig, apiKey string, prompt string) (*ClientWrapper, error) {
-
-	clientWr := &ClientWrapper{}
-
+func NewGeminiClient(apiKey string) (*genai.Client, error) {
 	ctx := context.Background()
+
+	httpClient := &http.Client{
+		Transport: &LogTransport{RoundTripper: http.DefaultTransport},
+		Timeout:   0,
+	}
+
+	if apiKey == "" {
+		return nil, fmt.Errorf("API key was not found, please check again if the API Key exists")
+	}
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
-		APIKey:  apiKey,
-		Backend: genai.BackendGeminiAPI,
+		APIKey:     apiKey,
+		Backend:    genai.BackendGeminiAPI,
+		HTTPClient: httpClient,
 	})
 	if err != nil {
-		return clientWr, fmt.Errorf("creating a gemini client failed: %w", err)
+		return nil, fmt.Errorf("Could not initialize a Gemini client")
+	}
+	return client, nil
+}
+
+func GenerateContent(api, prompt string) (string, error) {
+
+	ctx := context.Background()
+	client, _ := NewGeminiClient(api)
+	model := NewDefaultAppConfig(api).GeminiDefault.GeminiConfig.Model
+	cfg := GenerateContentConfigFromGeminiConfig(&config.NewDefaultAppConfig().GeminiDefault)
+
+	res, err := client.Models.GenerateContent(ctx, model, genai.Text(prompt), cfg)
+	if err != nil {
+		return "", fmt.Errorf("error calling GenerateContent: %w", err)
 	}
 	defer client.ClientConfig().HTTPClient.CloseIdleConnections()
 
-	return &ClientWrapper{
-		base_client:   client,
-		defaultConfig: &appCfg.GeminiDefault,
-	}, nil
-
-}
-
-func (cw *ClientWrapper) GenerateContent(ctx context.Context, userConfig *config.GeminiConfig, parts ...genai.Part) (*genai.GenerateContentResponse, error) {
-
-	// create a working copy of the defaultConfig that the user overrides
-	workingConfig := *cw.defaultConfig
-
-	if userConfig != nil {
-
-		if userConfig.Model != "" {
-			workingConfig.Model = userConfig.Model
-		}
-		if userConfig.Temperature != 0 {
-			workingConfig.Temperature = userConfig.Temperature
-		}
-		if userConfig.TopP != 0 {
-			workingConfig.TopP = userConfig.TopP
-		}
-		if userConfig.TopK != 0 {
-			workingConfig.TopK = userConfig.TopK
-		}
-		if userConfig.CandidateCount != 0 {
-			workingConfig.CandidateCount = userConfig.CandidateCount
-		}
-		if userConfig.Seed != 0 {
-			workingConfig.Seed = userConfig.Seed
-		}
-		if len(userConfig.StopSequences) > 0 {
-			workingConfig.StopSequences = userConfig.StopSequences
-		}
-
-		workingConfig.PresencePenalty = userConfig.PresencePenalty
-		workingConfig.FrequencyPenalty = userConfig.FrequencyPenalty
-
-		workingConfig.IncludeThoughts = userConfig.IncludeThoughts
-		workingConfig.ThinkingBudget = userConfig.ThinkingBudget
-
-		if len(userConfig.SafetySettings) > 0 {
-			workingConfig.SafetySettings = userConfig.SafetySettings
-		}
-		if workingConfig.ResponseMimeType != "" {
-			workingConfig.ResponseMimeType = userConfig.ResponseMimeType
-		}
-		if userConfig.SystemInstruction != "" {
-			workingConfig.SystemInstruction = userConfig.SystemInstruction
-		}
-	}
-
-	res, err := genai.Client.Models.GenerateContent(
-		ctx,
-		"gemini-2.0-flash",
-		genai.Text(prompt),
-		nil,
-	)
-	if err != nil {
-		return clientWr, fmt.Errorf("an error occurred when responding: %w", err)
-	}
 	if len(res.Candidates) == 0 {
 		// candiates are the differenct responses the LLM redponds with
 		// res.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
