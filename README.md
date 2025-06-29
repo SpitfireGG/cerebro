@@ -111,6 +111,38 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Inspired by the X-Men's Cerebro (but for AI, not mutants)
 - Thanks to all contributors and the Go community
 
+## Upcoming Features
+### 🤖 Multi-LLM Support
+
+ OpenAI GPT - GPT-3.5, GPT-4 integration
+ Anthropic Claude - Claude-3 series support
+ Ollama - Local model support
+ Hugging Face - Open-source model access
+ Cohere - Command and Generate models
+
+### ⚙️ Enhanced Configuration
+
+ Parameter Control Panel - Temperature, top-p, max tokens
+ Model Selection UI - Switch between different LLMs seamlessly
+ Custom Prompts - Save and manage prompt templates
+ Theme Customization - Multiple color schemes and layouts
+
+### 📚 Chat Management
+
+ Chat History Viewer - Browse previous conversations
+ Session Management - Save, load, and organize chat sessions
+ History Search - Find specific conversations quickly
+ Export Options - Save chats as markdown, JSON, or plain text
+ Bulk Operations - Delete multiple sessions at once
+
+### 🔧 Advanced Features
+
+ Streaming Responses - Real-time response display
+ Multi-turn Conversations - Context-aware chat sessions
+ File Upload Support - Analyze documents and images
+ Plugin System - Extensible architecture for custom features
+
+
 ## 🔗 Links
 
 - [Issues](https://github.com/spitfireGG/cerebro/issues) - Report bugs or request features
