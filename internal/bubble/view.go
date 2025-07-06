@@ -20,9 +20,14 @@ func (m Model) View() string {
 		return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, tableView)
 
 	case LLMwindow:
-		status := "Gemini ready for prompt..."
+
+		var status string = "Prompt Gemini"
+
+		if m.SpinnerModel.err != nil {
+			fmt.Println(m.SpinnerModel.err.Error())
+		}
 		if m.isLLMthinking {
-			status = "Thinking..."
+			status = fmt.Sprintf("Thinking%s", m.SpinnerModel.spinner.View())
 		}
 		return fmt.Sprintf("%s\n%s\n%s\n%s",
 			m.viewPort.View(),
