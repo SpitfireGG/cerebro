@@ -4,12 +4,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	api "github.com/spitfiregg/garlic/internal/api/gemini"
-	"github.com/spitfiregg/garlic/internal/bubble/chat"
-	"github.com/spitfiregg/garlic/window"
+	"github.com/charmbracelet/lipgloss"
+	api "github.com/spitfiregg/cerebro/internal/api/gemini"
+	"github.com/spitfiregg/cerebro/internal/bubble/chat"
+	"github.com/spitfiregg/cerebro/window"
 )
 
 // TODO: make struct member for more models ( add more models )
@@ -38,6 +40,12 @@ type UI struct {
 	width     int
 }
 
+type SpinnerModel struct {
+	spinner  spinner.Model
+	quitting bool
+	err      error
+}
+
 type App struct {
 	ui   *UI
 	chat *chat.Session
@@ -64,6 +72,7 @@ type Model struct {
 	//embed the defined structs into the main Model
 	App
 	UI
+	SpinnerModel
 	LLMreponseMsg
 	DebugModel
 }
@@ -74,7 +83,7 @@ func TextInputHandler() textinput.Model {
 	ti := textinput.New()
 	ti.Placeholder = "Talk to Gemini"
 	ti.Focus()
-	ti.Cursor.Blink = true
+	ti.Cursor.Blink = false
 	ti.CharLimit = 512
 	ti.Width = 80
 	return ti
@@ -85,6 +94,10 @@ func InitialModel(config *api.AppConfig) Model {
 	// jump straight to prompting the model
 	vp := viewport.New(vpWidth, vpHeight)
 	vp.SetContent("welcome to the Playground...")
+	// spinner
+	s := spinner.New()
+	s.Spinner = spinner.Points
+	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("69"))
 
 	return Model{
 
@@ -112,8 +125,8 @@ func InitialModel(config *api.AppConfig) Model {
 		},
 
 		// debugging
-		DebugModel: DebugModel{},
-	}
+		DebugModel:   DebugModel{},
+		SpinnerModel: SpinnerModel{spinner: s}}
 }
 
 func Transition(d time.Duration) tea.Cmd {
@@ -124,5 +137,5 @@ func Transition(d time.Duration) tea.Cmd {
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(textinput.Blink)
+	return m.SpinnerModel.spinner.Tick
 }
