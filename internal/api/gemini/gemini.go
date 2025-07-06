@@ -13,7 +13,7 @@ import (
 	"net/http/httputil"
 
 	"github.com/charmbracelet/glamour"
-	"github.com/spitfiregg/garlic/internal/config"
+	"github.com/spitfiregg/cerebro/internal/config"
 	"google.golang.org/genai"
 )
 
@@ -93,32 +93,39 @@ func GenerateContent(api, prompt string) (string, error) {
 	model := NewDefaultAppConfig(api).GeminiDefault.GeminiConfig.Model
 	cfg := GenerateContentConfigFromGeminiConfig(&config.NewDefaultAppConfig().GeminiDefault)
 
-	res, err := client.Models.GenerateContent(ctx, model, genai.Text(prompt), cfg)
+	response, err := client.Models.GenerateContent(ctx, model, genai.Text(prompt), cfg)
 	if err != nil {
 		return "", fmt.Errorf("error calling GenerateContent: %w", err)
 	}
 	defer client.ClientConfig().HTTPClient.CloseIdleConnections()
 
-	if len(res.Candidates) == 0 {
+	if len(response.Candidates) == 0 || response.Candidates == nil {
 		// candiates are the differenct responses the LLM redponds with
-		// res.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
-		if res.PromptFeedback != nil && len(res.PromptFeedback.BlockReason) > 0 {
-			return "", fmt.Errorf("no response candidate found, bot was blocked due to violation: %v", res.PromptFeedback.BlockReason)
+		// response.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
+		if response.PromptFeedback != nil && len(response.PromptFeedback.BlockReason) > 0 {
+			return "", fmt.Errorf("no response candidate found, bot was blocked due to violation: %v", response.PromptFeedback.BlockReason)
 		}
 		return "", fmt.Errorf("no response candidate found, issue with the model or something")
 	}
 
-	var botResponse strings.Builder
-	for _, part := range res.Candidates[0].Content.Parts {
-		botResponse.WriteString(part.Text)
+	var (
+		resp_rank   int = 0
+		botResponse strings.Builder
+		parts       []*genai.Part
+	)
+	parts = response.Candidates[resp_rank].Content.Parts
+	if parts == nil || len(parts) == 0 {
+		return "empty content", nil
+	} else {
+		for _, part := range parts {
+			botResponse.WriteString(part.Text)
+		}
 	}
-
+	// markdown response, seems pretty easy or am i doing it wrong ???
 	r, _ := glamour.NewTermRenderer(
 		glamour.WithStandardStyle("dark"),
 		glamour.WithWordWrap(120),
 	)
-
 	renderedResponse, err := r.Render(botResponse.String())
-
 	return renderedResponse, nil
 }
