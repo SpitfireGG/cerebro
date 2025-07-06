@@ -3,8 +3,8 @@ package bubble
 import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/spitfiregg/garlic/internal/debug"
-	"github.com/spitfiregg/garlic/window"
+	"github.com/spitfiregg/cerebro/internal/debug"
+	"github.com/spitfiregg/cerebro/window"
 )
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -25,7 +25,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.textInput.Width = msg.Width - 4
 
 	case tea.KeyMsg:
-		if msg.String() == "ctrl+c" || msg.String() == "q" {
+		if msg.String() == "ctrl+c" {
 			return m, tea.Quit
 		}
 
@@ -52,7 +52,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	switch m.currentState {
-
 	case GreetWindow:
 		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "enter" {
 			m.currentState = MainWindow
@@ -65,29 +64,36 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 	case LLMwindow:
+		// Only update spinner when thinking
 		if m.isLLMthinking {
-			return m, nil
-		}
+			m.spinner, cmd = m.spinner.Update(msg)
+			cmds = append(cmds, cmd)
+		} else {
+			// Handle user input only when not thinking
+			if key, ok := msg.(tea.KeyMsg); ok && key.String() == "enter" {
+				if m.textInput.Value() != "" {
+					prompt := m.textInput.Value()
+					m.isLLMthinking = true
+					m.chat.AddUserMessage(prompt)
+					m.updateViewportContent()
+					m.textInput.SetValue("")
 
-		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "enter" {
-			if m.textInput.Value() != "" {
-				prompt := m.textInput.Value()
-				m.isLLMthinking = true
-				m.chat.AddUserMessage(prompt)
-				m.updateViewportContent()
-				m.textInput.SetValue("")
-
-				cmd = m.GenerateReponse(prompt)
+					// Start the spinner when we begin thinking
+					cmd = tea.Batch(
+						m.GenerateReponse(prompt),
+						m.spinner.Tick, // This starts the spinner animation
+					)
+					cmds = append(cmds, cmd)
+				}
+			} else {
+				m.textInput, cmd = m.textInput.Update(msg)
 				cmds = append(cmds, cmd)
 			}
-		} else {
-			m.textInput, cmd = m.textInput.Update(msg)
-			cmds = append(cmds, cmd)
 		}
-	}
 
-	m.viewPort, cmd = m.viewPort.Update(msg)
-	cmds = append(cmds, cmd)
+		m.viewPort, cmd = m.viewPort.Update(msg)
+		cmds = append(cmds, cmd)
+	}
 
 	return m, tea.Batch(cmds...)
 }
