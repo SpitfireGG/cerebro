@@ -91,6 +91,7 @@ func GenerateContent(api, prompt string) (string, error) {
 	ctx := context.Background()
 	client, _ := NewGeminiClient(api)
 	model := NewDefaultAppConfig(api).GeminiDefault.GeminiConfig.Model
+
 	cfg := GenerateContentConfigFromGeminiConfig(&config.NewDefaultAppConfig().GeminiDefault)
 
 	response, err := client.Models.GenerateContent(ctx, model, genai.Text(prompt), cfg)
@@ -116,9 +117,14 @@ func GenerateContent(api, prompt string) (string, error) {
 	parts = response.Candidates[resp_rank].Content.Parts
 	if parts == nil || len(parts) == 0 {
 		return "empty content", nil
+
 	} else {
 		for _, part := range parts {
-			botResponse.WriteString(part.Text)
+			if part.Thought {
+				botResponse.WriteString(part.Text)
+			} else {
+				botResponse.WriteString(part.Text)
+			}
 		}
 	}
 	// markdown response, seems pretty easy or am i doing it wrong ???
