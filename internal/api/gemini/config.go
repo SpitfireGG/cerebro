@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 
-	"github.com/spitfiregg/garlic/internal/config"
+	"github.com/spitfiregg/cerebro/internal/config"
 	"google.golang.org/genai"
 )
 
@@ -55,7 +55,7 @@ func NewDefaultAppConfig(apiKey string) *AppConfig {
 			ApiKey string
 		}{
 			GeminiConfig: GeminiConfig{
-				Model:            "gemini-2.5-flash",
+				Model:            "gemini-2.5-pro",
 				Temperature:      0.9,
 				TopP:             0.5,
 				TopK:             20.0,
@@ -65,7 +65,7 @@ func NewDefaultAppConfig(apiKey string) *AppConfig {
 				PresencePenalty:  0.0,
 				FrequencyPenalty: 0.0,
 				IncludeThoughts:  true, // default to false
-				ThinkingBudget:   0,    // 0 for disabling and 1 for enabling
+				ThinkingBudget:   1510, // 0 for disabling and -1 for enabling dyamic thinking, will be auto adjusted based on the complexity of the program
 				SafetySettings: []SafetySettingConfig{
 					{Category: "HarmCategoryDangerousContent", Threshold: "BlockLowAndAbove"},
 					// define sensible default safety settings
@@ -124,9 +124,6 @@ func GenerateContentConfigFromGeminiConfig(cfg *config.GeminiConfig) *genai.Gene
 		return nil
 	}
 
-	thinkingBudget := cfg.ThinkingBudget
-	includeThoughts := cfg.IncludeThoughts
-
 	genConfig := &genai.GenerateContentConfig{
 		Temperature:      &cfg.Temperature,
 		TopP:             &cfg.TopP,
@@ -139,11 +136,18 @@ func GenerateContentConfigFromGeminiConfig(cfg *config.GeminiConfig) *genai.Gene
 		ResponseMIMEType: cfg.ResponseMimeType,
 	}
 
-	if includeThoughts || thinkingBudget > 0 {
-		genConfig.ThinkingConfig = &genai.ThinkingConfig{
-			IncludeThoughts: includeThoughts,
-			ThinkingBudget:  &thinkingBudget,
+	if cfg.IncludeThoughts {
+		thinkingConfig := &genai.ThinkingConfig{
+			IncludeThoughts: cfg.IncludeThoughts,
 		}
+
+		if cfg.ThinkingBudget >= 0 {
+			budget := cfg.ThinkingBudget
+			thinkingConfig.ThinkingBudget = &budget
+		}
+
+		genConfig.ThinkingConfig = thinkingConfig
 	}
+
 	return genConfig
 }
