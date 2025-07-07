@@ -6,7 +6,7 @@ User-Agent: google-genai-sdk/1.10.0 gl-go/go1.24.4
 Content-Length: 291
 Content-Type: application/json
 X-Goog-Api-Client: google-genai-sdk/1.10.0 gl-go/go1.24.4
-X-Goog-Api-Key: AIzaSyAPTZeU_eEPYcEWihYziBFxXa0ayV9dGPM
+X-Goog-Api-Key:
 Accept-Encoding: gzip
 
 {"contents":[{"parts":[{"text":"wyhat nakjfbkasjbfkaft"}],"role":"user"}],"generationConfig":{"candidateCount":1,"frequencyPenalty":0,"presencePenalty":0,"seed":5,"stopSequences":["Stop!"],"temperature":0.9,"thinkingConfig":{"includeThoughts":true,"thinkingBudget":0},"topK":20,"topP":0.5}}
