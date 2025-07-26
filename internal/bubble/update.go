@@ -4,7 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spitfiregg/cerebro/internal/debug"
-	"github.com/spitfiregg/cerebro/window"
+	"github.com/spitfiregg/cerebro/internal/window"
 )
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -78,10 +78,10 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.updateViewportContent()
 					m.textInput.SetValue("")
 
-					// Start the spinner when we begin thinking
+					// start the spinner when we begin thinking
 					cmd = tea.Batch(
 						m.GenerateReponse(prompt),
-						m.spinner.Tick, // This starts the spinner animation
+						m.spinner.Tick,
 					)
 					cmds = append(cmds, cmd)
 				}

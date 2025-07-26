@@ -1,4 +1,4 @@
-module github.com/spitfiregg/garlic
+module github.com/spitfiregg/cerebro
 
 go 1.24.2
 

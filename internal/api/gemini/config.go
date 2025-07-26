@@ -64,8 +64,8 @@ func NewDefaultAppConfig(apiKey string) *AppConfig {
 				StopSequences:    []string{"Stop!"},
 				PresencePenalty:  0.0,
 				FrequencyPenalty: 0.0,
-				IncludeThoughts:  true, // default to false
-				ThinkingBudget:   1510, // 0 for disabling and -1 for enabling dyamic thinking, will be auto adjusted based on the complexity of the program
+				IncludeThoughts:  false, // default to false
+				ThinkingBudget:   0,     // 0 for disabling and -1 for enabling dyamic thinking, will be auto adjusted based on the complexity of the program
 				SafetySettings: []SafetySettingConfig{
 					{Category: "HarmCategoryDangerousContent", Threshold: "BlockLowAndAbove"},
 					// define sensible default safety settings

@@ -115,7 +115,7 @@ func GenerateContent(api, prompt string) (string, error) {
 		parts       []*genai.Part
 	)
 	parts = response.Candidates[resp_rank].Content.Parts
-	if parts == nil || len(parts) == 0 {
+	if len(parts) == 0 {
 		return "empty content", nil
 
 	} else {
@@ -127,7 +127,7 @@ func GenerateContent(api, prompt string) (string, error) {
 			}
 		}
 	}
-	// markdown response, seems pretty easy or am i doing it wrong ???
+	// markdown response, seems pretty easy for small rendering , i should be making my own i guessss.................
 	r, _ := glamour.NewTermRenderer(
 		glamour.WithStandardStyle("dark"),
 		glamour.WithWordWrap(120),

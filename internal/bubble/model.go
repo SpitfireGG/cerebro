@@ -11,7 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	api "github.com/spitfiregg/cerebro/internal/api/gemini"
 	"github.com/spitfiregg/cerebro/internal/bubble/chat"
-	"github.com/spitfiregg/cerebro/window"
+	"github.com/spitfiregg/cerebro/internal/window"
 )
 
 // TODO: make struct member for more models ( add more models )
@@ -93,7 +93,7 @@ func InitialModel(config *api.AppConfig) Model {
 
 	// jump straight to prompting the model
 	vp := viewport.New(vpWidth, vpHeight)
-	vp.SetContent("welcome to the Playground...")
+
 	// spinner
 	s := spinner.New()
 	s.Spinner = spinner.Points

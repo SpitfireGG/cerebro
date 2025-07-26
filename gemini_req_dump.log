@@ -1,2 +1,2 @@
-{"contents":[{"parts":[{"text":"wyhat nakjfbkasjbfkaft"}],"role":"user"}],"generationConfig":{"candidateCount":1,"frequencyPenalty":0,"presencePenalty":0,"seed":5,"stopSequences":["Stop!"],"temperature":0.9,"thinkingConfig":{"includeThoughts":true,"thinkingBudget":0},"topK":20,"topP":0.5}}
+{"contents":[{"parts":[{"text":"what is windows ???"}],"role":"user"}],"generationConfig":{"candidateCount":1,"frequencyPenalty":0,"presencePenalty":0,"seed":5,"stopSequences":["Stop!"],"temperature":0.9,"topK":20,"topP":0.5}}
 
