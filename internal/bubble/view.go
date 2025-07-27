@@ -6,29 +6,20 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spitfiregg/cerebro/internal/bubble/style"
+	"github.com/spitfiregg/cerebro/internal/bubble/window"
 )
 
 func (m Model) View() string {
 	switch m.currentState {
+
 	case GreetWindow:
+		return window.RenderLogo(m.width, m.height)
 
-		logo := `
-    ██████╗███████╗██████╗ ███████╗██████╗ ██████╗  ██████╗
-   ██╔════╝██╔════╝██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔═══██╗
-   ██║     █████╗  ██████╔╝█████╗  ██████╔╝██████╔╝██║   ██║
-   ██║     ██╔══╝  ██╔══██╗██╔══╝  ██╔══██╗██╔══██╗██║   ██║
-   ╚██████╗███████╗██║  ██║███████╗██████╔╝██║  ██║╚██████╔╝
-    ╚═════╝╚══════╝╚═╝  ╚═╝╚══════╝╚═════╝ ╚═╝  ╚═╝ ╚═════╝
-	`
-		logoStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#B22222")).Bold(true)
-		return logoStyle.Render(lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, logo))
-
-	case MainWindow:
+	case ModelSelection:
 		tableView := m.LLMSelectorWindow.View()
-
 		return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, tableView)
 
-	case LLMwindow:
+	case MainWindow:
 
 		var status string = "Prompt Gemini"
 

@@ -8,6 +8,11 @@ import (
 	"golang.org/x/term"
 )
 
+type TermSize struct {
+	Width int
+	Float int
+}
+
 // GetTermSize() outputs the current length and width of the terminal
 func GetTermSize() (width, height int) {
 	fd := int(os.Stdout.Fd())

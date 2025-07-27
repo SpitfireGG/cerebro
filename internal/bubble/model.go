@@ -11,7 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	api "github.com/spitfiregg/cerebro/internal/api/gemini"
 	"github.com/spitfiregg/cerebro/internal/bubble/chat"
-	"github.com/spitfiregg/cerebro/internal/window"
+	"github.com/spitfiregg/cerebro/internal/bubble/window"
 )
 
 // TODO: make struct member for more models ( add more models )
@@ -27,8 +27,8 @@ type State int
 
 const (
 	GreetWindow State = iota
+	ModelSelection
 	MainWindow
-	LLMwindow
 	SettingsWindow
 )
 

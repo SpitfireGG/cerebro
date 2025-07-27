@@ -3,8 +3,8 @@ package bubble
 import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/spitfiregg/cerebro/internal/bubble/window"
 	"github.com/spitfiregg/cerebro/internal/debug"
-	"github.com/spitfiregg/cerebro/internal/window"
 )
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -17,6 +17,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
+
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
@@ -30,15 +31,16 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case window.ModelSelectedMsg:
+
 		m.selectedLLM = msg.ModelName
-		m.currentState = LLMwindow // transition to the chat window
+		m.currentState = MainWindow // transition to the chat window
 		m.chat.AddSystemMessage("Model selected: " + msg.ModelName)
 		m.updateViewportContent()
 		m.viewPort.GotoBottom()
 		return m, textinput.Blink
 
 	case LLMreponseMsg:
-		if m.currentState == LLMwindow {
+		if m.currentState == MainWindow {
 			m.isLLMthinking = false
 			if msg.err != nil {
 				m.chat.AddSystemMessage("Error: " + msg.err.Error())
@@ -54,16 +56,24 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m.currentState {
 	case GreetWindow:
 		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "enter" {
-			m.currentState = MainWindow
+			m.currentState = ModelSelection
 		}
 
-	case MainWindow:
+	case ModelSelection:
+
+		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "esc" {
+			m.currentState = GreetWindow
+		}
 		var newTableModel tea.Model
 		newTableModel, cmd = m.LLMSelectorWindow.Update(msg)
 		m.LLMSelectorWindow = newTableModel.(window.LLMmodel)
 		cmds = append(cmds, cmd)
 
-	case LLMwindow:
+	case MainWindow:
+		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "esc" {
+			m.currentState = ModelSelection
+		}
+
 		// Only update spinner when thinking
 		if m.isLLMthinking {
 			m.spinner, cmd = m.spinner.Update(msg)

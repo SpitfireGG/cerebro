@@ -49,6 +49,8 @@ func (m *Model) updateViewportContent() {
 		for i, msg := range history {
 			// Create styled message bubble based on role
 			var styledMessage string
+
+			// strings.Title is deprecated
 			roleLabel := style.GetRoleStyle(string(msg.Role)).Render(strings.Title(string(msg.Role)))
 			messageBubble := style.GetMessageBubbleStyle(string(msg.Role))
 
