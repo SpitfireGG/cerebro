@@ -1,19 +1,21 @@
 package main
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/spitfiregg/cerebro/cmd/auth"
-	"github.com/spitfiregg/cerebro/internal/bubble"
-	"github.com/spitfiregg/cerebro/internal/debug"
+	"fmt"
 	"log"
 	"os"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/spitfiregg/cerebro/cmd/auth"
+	"github.com/spitfiregg/cerebro/internal/ui"
+	"github.com/spitfiregg/cerebro/internal/debug"
 )
 
 // TODO: add feat:  initiate multiple reponses with concurrency
 
 func main() {
 
-	model := bubble.InitialModel(auth.LoadAPiKey())
+	model := ui.InitialModel(auth.LoadAPiKey())
 
 	var dbgModel debug.Debug
 	dbgModel.EnterDebug("", "debug.log")
@@ -26,4 +28,15 @@ func main() {
 		os.Exit(1)
 	}
 	dbgModel.CloseDebug()
+
+	// ui tea debugging
+	if len(os.Getenv("DEBUG")) > 0 {
+		f, err := tea.LogToFile("debug.log", "debug")
+		if err != nil {
+			fmt.Println("fatal:", err)
+			os.Exit(1)
+		}
+		defer f.Close()
+	}
+
 }

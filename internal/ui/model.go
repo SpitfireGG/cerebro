@@ -1,4 +1,4 @@
-package bubble
+package ui
 
 import (
 	"os"
@@ -10,8 +10,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	api "github.com/spitfiregg/cerebro/internal/api/gemini"
-	"github.com/spitfiregg/cerebro/internal/bubble/chat"
-	"github.com/spitfiregg/cerebro/internal/bubble/window"
+	"github.com/spitfiregg/cerebro/internal/chat"
+	"github.com/spitfiregg/cerebro/internal/ui/states"
 )
 
 // TODO: make struct member for more models ( add more models )
@@ -81,11 +81,12 @@ type TransitionToMain struct{}
 
 func TextInputHandler() textinput.Model {
 	ti := textinput.New()
-	ti.Placeholder = "Talk to Gemini"
+	ti.Placeholder = ""
 	ti.Focus()
-	ti.Cursor.Blink = false
+	ti.Cursor.Blink = true
 	ti.CharLimit = 512
 	ti.Width = 80
+
 	return ti
 }
 
@@ -96,8 +97,8 @@ func InitialModel(config *api.AppConfig) Model {
 
 	// spinner
 	s := spinner.New()
-	s.Spinner = spinner.Points
-	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("69"))
+	s.Spinner = spinner.Meter
+	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#1658EE"))
 
 	return Model{
 
@@ -137,5 +138,5 @@ func Transition(d time.Duration) tea.Cmd {
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.SpinnerModel.spinner.Tick
+	return m.spinner.Tick
 }

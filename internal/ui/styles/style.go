@@ -1,6 +1,8 @@
-package style
+package styles
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"github.com/charmbracelet/lipgloss"
+)
 
 var (
 	Black          = "#000000"
@@ -20,6 +22,7 @@ var (
 	ElectricBlue   = "#7df9ff"
 	NeonGreen      = "#39ff14"
 	Purple         = "#7D56F4"
+	PrussianBlue   = "#003153"
 
 	// extra sauce
 	ICS             = "#33b5e5"
@@ -87,7 +90,7 @@ var (
 			Align(lipgloss.Center)
 )
 
-// Chat bubble styles
+// Chat ui styles
 var (
 	UserMessageStyle = lipgloss.NewStyle().
 				Border(RoundedBorder).
@@ -100,12 +103,7 @@ var (
 
 	AssistantMessageStyle = lipgloss.NewStyle().
 				Border(RoundedBorder).
-				BorderForeground(lipgloss.Color(ElectricBlue)).
-				Background(BackgroundSecondary).
-				Padding(1, 2).
-				Margin(0, 10, 1, 0).
-				MaxWidth(60).
-				Align(lipgloss.Center)
+				BorderForeground(lipgloss.Color(ElectricBlue))
 
 	SystemMessageStyle = lipgloss.NewStyle().
 				Border(SharpBorder).
@@ -121,19 +119,13 @@ var (
 var (
 	InputStyle = lipgloss.NewStyle().
 			Border(RoundedBorder).
-			BorderForeground(BorderAccentColor).
+			BorderForeground(lipgloss.Color(PrussianBlue)).
 			Padding(0, 1).
-			Margin(1, 0).
-			Background(BackgroundPrimary).
+			Margin(0, 0).
 			Foreground(TextPrimaryColor)
 
 	InputFocusedStyle = lipgloss.NewStyle().
-				Border(ThickBorder).
-				BorderForeground(SelectedColor).
-				Padding(0, 1).
-				Margin(1, 0).
-				Background(BackgroundSecondary).
-				Foreground(TextPrimaryColor)
+				Foreground(TextPrimaryColor).Bold(true).Italic(true)
 
 	StatusBarStyle = lipgloss.NewStyle().
 			Background(BackgroundAccent).
@@ -143,10 +135,7 @@ var (
 			Width(100)
 
 	ThinkingStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color(White)).
-			Background(BackgroundSecondary).
-			Padding(0, 1).
-			Margin(0, 1).
+			Foreground(lipgloss.Color(AntiFlashWhite)).
 			Bold(true).
 			Italic(true)
 

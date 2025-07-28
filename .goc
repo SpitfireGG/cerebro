@@ -90,10 +90,6 @@ linters:
     - whitespace
     - exhaustruct
   settings:
-    depguard:
-      Variables:
-        - $all
-        - $gostd
     cyclop:
       max-complexity: 30
       package-average: 10.0

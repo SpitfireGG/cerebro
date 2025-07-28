@@ -1,4 +1,4 @@
-package bubble
+package ui
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	api "github.com/spitfiregg/cerebro/internal/api/gemini"
-	"github.com/spitfiregg/cerebro/internal/bubble/chat"
-	"github.com/spitfiregg/cerebro/internal/bubble/style"
+	"github.com/spitfiregg/cerebro/internal/chat"
+	"github.com/spitfiregg/cerebro/internal/ui/styles"
 )
 
 // reposible for generating the reponse
@@ -37,9 +37,9 @@ func (m *Model) updateViewportContent() {
 	m.chat.Clear()
 	if len(history) == 0 {
 
-		welcomeMsg := style.CreateTitle("Welcome to Cerebro!", m.width-4)
+		welcomeMsg := styles.CreateTitle("Welcome to Cerebro!", m.width-4)
 		instructions := lipgloss.NewStyle().
-			Foreground(style.TextSecondaryColor).
+			Foreground(styles.TextSecondaryColor).
 			Margin(2, 0).
 			Align(lipgloss.Center).
 			Render("Start typing to chat with Gemini AI\nPress 'h' for help, 'q' to quit")
@@ -47,29 +47,43 @@ func (m *Model) updateViewportContent() {
 
 	} else {
 		for i, msg := range history {
-			// Create styled message bubble based on role
+
+			// Create styled message ui based on role
 			var styledMessage string
 
+			/* 			styles.DrawTop(m.width, m.height, m.width, "something") */
+
 			// strings.Title is deprecated
-			roleLabel := style.GetRoleStyle(string(msg.Role)).Render(strings.Title(string(msg.Role)))
-			messageBubble := style.GetMessageBubbleStyle(string(msg.Role))
+			roleLabel := styles.GetRoleStyle(string(msg.Role)).Render(strings.Title(string(msg.Role)))
+			messageBubble := styles.GetMessageBubbleStyle(string(msg.Role))
 
 			switch msg.Role {
 			case chat.RoleUser:
+
+				op := strings.Repeat(styles.HLine, m.width-2)
 				styledMessage = lipgloss.JoinVertical(
-					lipgloss.Left,
-					roleLabel, messageBubble.Render(msg.Content),
+					lipgloss.Center,
+					lipgloss.NewStyle().Render(op),
+					/* 					roleLabel, messageBubble.Render(msg.Content),  */
+
 				)
 			case chat.RoleAssistant:
 				// Add typing indicator if this is the last message and still generating
 				content := msg.Content
 				if i == len(history)-1 && m.isLLMthinking && content == "" {
-					content = fmt.Sprintf("Thinking %s", m.SpinnerModel.spinner.View())
+					content = fmt.Sprintf("Thinking %s", m.spinner.View())
 				}
-				styledMessage = lipgloss.JoinVertical(
+				/* styledMessage = lipgloss.JoinVertical(
 					lipgloss.Left,
 					roleLabel,
 					messageBubble.Render(content),
+				) */
+				op := strings.Repeat(styles.HLine, m.width-2)
+				styledMessage = lipgloss.JoinVertical(
+					lipgloss.Center,
+					lipgloss.NewStyle().Render(op),
+					/* 					roleLabel, messageBubble.Render(msg.Content),  */
+
 				)
 			case chat.RoleSystem:
 				styledMessage = lipgloss.JoinVertical(

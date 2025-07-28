@@ -1,10 +1,10 @@
-package bubble
+package ui
 
 import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/spitfiregg/cerebro/internal/bubble/window"
 	"github.com/spitfiregg/cerebro/internal/debug"
+	"github.com/spitfiregg/cerebro/internal/ui/states"
 )
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -70,6 +70,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 	case MainWindow:
+
+		// revert back to LLM selection window  on `esc`
 		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "esc" {
 			m.currentState = ModelSelection
 		}
