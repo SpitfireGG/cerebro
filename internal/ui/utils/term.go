@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
 )
 
@@ -31,7 +30,7 @@ func GetTermSize() (width, height int) {
 
 // PlaceContentCenter() function helps place contents to the center of the terminal
 // Align.Center() dont work for contents inside borders
-func PlaceContentCenter(content string) {
+/* func PlaceContentCenter(content string) {
 	termWidth, _ := GetTermSize()
 
 	contentWidth := lipgloss.Width(content)
@@ -42,4 +41,4 @@ func PlaceContentCenter(content string) {
 		remainedSpace = 0
 	}
 	margin := remainedSpace / 2
-}
+} */

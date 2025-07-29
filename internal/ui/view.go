@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spitfiregg/cerebro/internal/ui/states"
 	"github.com/spitfiregg/cerebro/internal/ui/styles"
@@ -41,6 +42,13 @@ func (m Model) View() string {
 		m.viewPort.Height = m.height - inputAreaHeight - 2
 
 		promptBoxContent := status + "\n" + m.textInput.View()
+		/* PromptBoxHeight := styles.InputStyle.Height(lipgloss.Height(promptBoxContent))
+		// init
+		promptBox := window.PromptBox{
+			Width: m.width - 2,
+			Height: PromptBoxHeight,
+		} */
+
 		promptBox := styles.InputStyle.Width(m.width - 2).Height(lipgloss.Height(promptBoxContent)).Render(promptBoxContent)
 
 		ren := lipgloss.JoinVertical(lipgloss.Top, m.viewPort.View(), promptBox)

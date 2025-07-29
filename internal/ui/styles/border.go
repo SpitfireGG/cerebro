@@ -10,16 +10,13 @@ type pos int
 
 // Box struct dictates the position to set the border and dimensions to put the box on
 type Box struct {
-	// We would like to add a title to in the border itself and the library's border is crap for that
 	X, Y          pos
 	Width, Height int
 }
 
 // Title struct defines the properties of the title
 type Title struct {
-	Text     string
-	Color    lipgloss.ANSIColor
-	Position int
+	Text string
 }
 
 // define ASCII chars for custom border
@@ -58,18 +55,11 @@ const (
 	Arrow  = "→"
 )
 
-// ANSI escape codes for terminal control
-const (
-	Reset      = "\033[0m"
-	Clear      = "\033[2J"
-	Home       = "\033[H"
-	HideCursor = "\033[?25l"
-	ShowCursor = "\033[?25h"
+var title = Title{
+	Text: "title",
+}
 
-	ColorReset = "\033[0m"
-	ColorBold  = "\033[1m"
-	ColorDim   = "\033[2m"
-)
+var TitleHardcoded = fmt.Sprintf(RoundRightUp + HLine + DivRight + title.Text + DivLeft)
 
 var (
 	RoundedBorder = lipgloss.Border{
@@ -111,38 +101,4 @@ var (
 	cherryRed    = "#c40000"
 )
 
-// moveCursor places the cursor to specific locations in the screeen
-// ANSI code: ESC[{line};{column}H
-func moveCursor(x, y int) {
-	fmt.Printf("\033[%d;%dH", y, x)
-}
-
-// DrawTop function draws the border with title in it
-func DrawTop(x, y int, width int, title string) {
-
-	style := lipgloss.NewStyle().Foreground(lipgloss.Color(prussianBlue))
-
-	moveCursor(x, y)
-	style.Render(RoundLeftUp)
-
-	pos := 1
-	moveCursor(x+pos, y)
-	style.Render(HLine)
-
-	titleLen := len(title)
-	fmt.Print(ColorReset + cherryRed + "" + title + "" + ColorReset + cherryRed)
-
-	moveCursor(x+pos+titleLen, y)
-
-	currentPos := x + pos + titleLen
-
-	for currentPos < width-1 {
-		style.Render(HLine)
-		currentPos++
-
-		if currentPos < width-1 {
-			fmt.Print(VLine)
-		}
-	}
-
-}
+func drawTitleArea() {}

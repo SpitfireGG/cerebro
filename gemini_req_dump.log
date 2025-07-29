@@ -1,2 +1,2 @@
-{"contents":[{"parts":[{"text":"what is an api ?"}],"role":"user"}],"generationConfig":{"candidateCount":1,"frequencyPenalty":0,"presencePenalty":0,"seed":5,"stopSequences":["Stop!"],"temperature":0.9,"topK":20,"topP":0.5}}
+{"contents":[{"parts":[{"text":"apple'"}],"role":"user"}],"generationConfig":{"candidateCount":1,"frequencyPenalty":0,"presencePenalty":0,"seed":5,"stopSequences":["Stop!"],"temperature":0.9,"topK":20,"topP":0.5}}
 
