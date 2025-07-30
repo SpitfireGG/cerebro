@@ -1,2 +1,0 @@
-{"contents":[{"parts":[{"text":"apple'"}],"role":"user"}],"generationConfig":{"candidateCount":1,"frequencyPenalty":0,"presencePenalty":0,"seed":5,"stopSequences":["Stop!"],"temperature":0.9,"topK":20,"topP":0.5}}
-
