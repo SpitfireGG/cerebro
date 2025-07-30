@@ -23,69 +23,21 @@ func (m *Model) GenerateReponse(prompt string) tea.Cmd {
 }
 
 const (
-	// Better choices for title connectors
-	TitleConnectorLeft  = "┤" // ┤
-	TitleConnectorRight = "├" // ├
+	TitleConnectorLeft  = "┤"
+	TitleConnectorRight = "├"
 
-	// Alternative minimal approach
-	TitleSimpleLeft  = "─" // Just use horizontal line
-	TitleSimpleRight = "─" // Just use horizontal line
+	TitleSimpleLeft  = "─"
+	TitleSimpleRight = "─"
 
-	// Decorative approach
-	TitleFancyLeft  = "┨" // ┨
-	TitleFancyRight = "┠" // ┠
+	TitleFancyLeft  = "┨"
+	TitleFancyRight = "┠"
 )
 
-// CreateCenteredTitleLine creates a horizontal line with centered title
-func CreateCenteredTitleLine(title string, totalWidth int) string {
-	if totalWidth < len(title)+2 {
-		// Not enough space, return truncated title
-		if totalWidth <= 0 {
-			return ""
-		}
-		if totalWidth <= len(title) {
-			return title[:totalWidth]
-		}
-		return title
-	}
+/* func setPos(x, y int) {
+	fmt.Printf("\033[%d;%dH", y, x)
 
-	// Calculate spacing
-	titleLen := len(title)
-	connectorChars := 2 // left + right connectors
-	availableSpace := totalWidth - titleLen - connectorChars
+} */
 
-	leftPadding := availableSpace / 2
-	rightPadding := availableSpace - leftPadding // Handles odd numbers
-
-	// Build the line
-	return strings.Repeat(styles.HLine, leftPadding) +
-		TitleConnectorLeft +
-		title +
-		TitleConnectorRight +
-		strings.Repeat(styles.HLine, rightPadding)
-}
-
-// CreateSimpleTitleLine creates a minimal title line without connectors
-func CreateSimpleTitleLine(title string, totalWidth int) string {
-	if totalWidth < len(title) {
-		if totalWidth <= 0 {
-			return ""
-		}
-		return title[:totalWidth]
-	}
-
-	titleLen := len(title)
-	availableSpace := totalWidth - titleLen
-
-	leftPadding := availableSpace / 2
-	rightPadding := availableSpace - leftPadding
-
-	return strings.Repeat(styles.HLine, leftPadding) +
-		title +
-		strings.Repeat(styles.HLine, rightPadding)
-}
-
-// CreateStyledTitleLine creates a title line with lipgloss styling
 func CreateStyledTitleLine(title string, totalWidth int) string {
 	borderStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#003153"))
 	titleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#c40000")).Bold(true)
@@ -110,56 +62,6 @@ func CreateStyledTitleLine(title string, totalWidth int) string {
 	return leftLines + leftConnector + styledTitle + rightConnector + rightLines
 }
 
-// CreateTitleLineVariants shows different visual styles
-func CreateTitleLineVariants(title string, totalWidth int) map[string]string {
-	variants := make(map[string]string)
-
-	// Basic centered
-	variants["basic"] = CreateSimpleTitleLine(title, totalWidth)
-
-	// With connectors
-	variants["connected"] = CreateCenteredTitleLine(title, totalWidth)
-
-	// Minimal brackets
-	if totalWidth >= len(title)+4 {
-		titleLen := len(title)
-		availableSpace := totalWidth - titleLen - 4 // for [ ] brackets
-		leftPadding := availableSpace / 2
-		rightPadding := availableSpace - leftPadding
-
-		variants["brackets"] = strings.Repeat(styles.HLine, leftPadding) +
-			"[ " + title + " ]" +
-			strings.Repeat(styles.HLine, rightPadding)
-	}
-
-	// Double line style
-	if totalWidth >= len(title)+2 {
-		titleLen := len(title)
-		availableSpace := totalWidth - titleLen - 2
-		leftPadding := availableSpace / 2
-		rightPadding := availableSpace - leftPadding
-
-		variants["double"] = strings.Repeat("═", leftPadding) +
-			"╡" + title + "╞" +
-			strings.Repeat("═", rightPadding)
-	}
-
-	return variants
-}
-
-// DebugTitleLine helps debug width calculations
-func DebugTitleLine(title string, totalWidth int) string {
-	result := CreateCenteredTitleLine(title, totalWidth)
-	actualWidth := len(result)
-
-	debug := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("red")).
-		Render(fmt.Sprintf("\nDEBUG: Expected width: %d, Actual width: %d, Title: '%s'",
-			totalWidth, actualWidth, title))
-
-	return result + debug
-}
-
 // updateViewportContent method is responsible for updating the contents being displayed in
 // the viewport of the TUI interface
 func (m *Model) updateViewportContent() {
@@ -169,7 +71,7 @@ func (m *Model) updateViewportContent() {
 
 	history := m.chat.GetHistory()
 
-	// if lengt of history is `0`, we create a new session for the user
+	// if length of history is `0`, we create a new session for the user
 	// works everytime
 
 	m.chat.Clear()
@@ -203,7 +105,12 @@ func (m *Model) updateViewportContent() {
 
 			// strings.Title is deprecated
 			/* 			roleLabel := styles.GetRoleStyle(string(msg.Role)).Render(strings.Title(string(msg.Role))) */
-			messageBubble := styles.GetMessageBubbleStyle(string(msg.Role))
+			/* 			messageBubble := styles.GetMessageBubbleStyle(string(msg.Role)) */
+			msgContent := lipgloss.NewStyle().Foreground(lipgloss.Color(styles.AntiFlashWhite)).
+				Background(lipgloss.Color("#F35865")).
+				Bold(true).
+				Italic(false).
+				Align(lipgloss.Center)
 
 			titleLine := CreateStyledTitleLine(title, m.width)
 
@@ -213,8 +120,9 @@ func (m *Model) updateViewportContent() {
 				styledMessage = lipgloss.JoinVertical(
 					lipgloss.Center,
 					titleLine,
-					messageBubble.Render(msg.Content),
+					msgContent.Render(msg.Content),
 				)
+
 			case chat.RoleAssistant:
 				// Add typing indicator if this is the last message and still generating
 				content := msg.Content
@@ -224,19 +132,14 @@ func (m *Model) updateViewportContent() {
 				styledMessage = lipgloss.JoinVertical(
 					lipgloss.Left,
 					titleLine,
-					messageBubble.Render(content),
-				)
-				styledMessage = lipgloss.JoinVertical(
-					lipgloss.Center,
-					lipgloss.NewStyle().Render(titleLine),
-					messageBubble.Render(msg.Content),
-				)
+					msgContent.Render(content))
+
 			case chat.RoleSystem:
 				styledMessage = lipgloss.JoinVertical(
 					lipgloss.Center,
 					titleLine,
-					messageBubble.Render(msg.Content),
-				)
+					msgContent.Render(msg.Content))
+
 			}
 
 			content.WriteString(styledMessage)

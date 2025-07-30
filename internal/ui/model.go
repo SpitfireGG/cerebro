@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
-	"github.com/charmbracelet/bubbles/textinput"
+	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -34,10 +34,10 @@ const (
 
 // define the main program state
 type UI struct {
-	textInput textinput.Model
-	viewPort  viewport.Model
-	height    int
-	width     int
+	textArea textarea.Model
+	viewPort viewport.Model
+	height   int
+	width    int
 }
 
 type SpinnerModel struct {
@@ -69,6 +69,8 @@ type Model struct {
 	LLMSelectorWindow window.LLMmodel
 	selectedLLM       string
 
+	Timestamp time.Time
+
 	//embed the defined structs into the main Model
 	App
 	UI
@@ -79,15 +81,22 @@ type Model struct {
 
 type TransitionToMain struct{}
 
-func TextInputHandler() textinput.Model {
-	ti := textinput.New()
-	ti.Placeholder = ""
-	ti.Focus()
-	ti.Cursor.Blink = true
-	ti.CharLimit = 512
-	ti.Width = 80
+func TextInputHandler() textarea.Model {
+	textarea := textarea.New()
+	textarea.Placeholder = ""
+	textarea.Focus()
+	textarea.Cursor.Blink = true
+	textarea.CharLimit = 512
+	textarea.Prompt = "┃ "
+	textarea.SetWidth(30)
+	textarea.SetHeight(3)
 
-	return ti
+	// Remove cursor line styling
+	textarea.FocusedStyle.CursorLine = lipgloss.NewStyle().Foreground(lipgloss.Color("#3a2b3c"))
+
+	textarea.ShowLineNumbers = false
+
+	return textarea
 }
 
 func InitialModel(config *api.AppConfig) Model {
@@ -100,7 +109,10 @@ func InitialModel(config *api.AppConfig) Model {
 	s.Spinner = spinner.Meter
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#1658EE"))
 
+	tnow := time.Now()
 	return Model{
+
+		Timestamp: tnow,
 
 		currentState:      GreetWindow,
 		LLMSelectorWindow: window.NewModel(),
@@ -109,8 +121,8 @@ func InitialModel(config *api.AppConfig) Model {
 
 		// the whole ui of the program
 		UI: UI{
-			textInput: TextInputHandler(),
-			viewPort:  vp,
+			textArea: TextInputHandler(),
+			viewPort: vp,
 		},
 
 		// the app itself
@@ -128,6 +140,7 @@ func InitialModel(config *api.AppConfig) Model {
 		// debugging
 		DebugModel:   DebugModel{},
 		SpinnerModel: SpinnerModel{spinner: s}}
+
 }
 
 func Transition(d time.Duration) tea.Cmd {

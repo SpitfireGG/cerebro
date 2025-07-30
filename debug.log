@@ -1,25 +1,16 @@
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:07.914850251 +0545 +0545 m=+0.027160569,
+ Time: (time.Time) 2025-07-30 17:44:12.823878745 +0545 +0545 m=+0.028108111,
  tag: (int) 0,
  ID: (int) 1
 }
 (tea.WindowSizeMsg) {
  Width: (int) 131,
- Height: (int) 30
+ Height: (int) 32
 }
 (tea.KeyMsg) enter
-(tea.KeyMsg) down
-(tea.KeyMsg) down
-(tea.KeyMsg) up
-(tea.KeyMsg) up
-(tea.KeyMsg) down
-(tea.KeyMsg) down
-(tea.KeyMsg) down
-(tea.KeyMsg) down
-(tea.KeyMsg) down
 (tea.KeyMsg) enter
 (window.ModelSelectedMsg) {
- ModelName: (string) (len=14) "Llama 3.1 405B"
+ ModelName: (string) (len=16) "Gemini Flash 2.5"
 }
 (cursor.initialBlinkMsg) {
 }
@@ -30,6 +21,10 @@
 (cursor.BlinkMsg) {
  id: (int) 0,
  tag: (int) 3
+}
+(cursor.BlinkMsg) {
+ id: (int) 0,
+ tag: (int) 4
 }
 (tea.KeyMsg) w
 (cursor.blinkCanceled) {
@@ -58,9 +53,6 @@
 (tea.KeyMsg) w
 (cursor.blinkCanceled) {
 }
-(tea.KeyMsg) q
-(cursor.blinkCanceled) {
-}
 (tea.KeyMsg) i
 (cursor.blinkCanceled) {
 }
@@ -70,127 +62,419 @@
 (tea.KeyMsg) d
 (cursor.blinkCanceled) {
 }
+(tea.KeyMsg) p
+(cursor.blinkCanceled) {
+}
 (tea.KeyMsg) o
 (cursor.blinkCanceled) {
 }
-(tea.KeyMsg) s
+(tea.KeyMsg) w
 (cursor.blinkCanceled) {
 }
-(tea.KeyMsg) k
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) n
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) k
-(tea.KeyMsg) fo
-(cursor.blinkCanceled) {
-}
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) n
-(cursor.blinkCanceled) {
+(cursor.BlinkMsg) {
+ id: (int) 0,
+ tag: (int) 20
 }
 (tea.KeyMsg) s
 (cursor.blinkCanceled) {
 }
-(tea.KeyMsg) d
+(tea.KeyMsg)  
 (cursor.blinkCanceled) {
 }
-(tea.KeyMsg) k
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) g
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) n
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) l
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) s
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) d
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) a
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) g
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) sd
-(cursor.blinkCanceled) {
-}
-(tea.KeyMsg) f
+(tea.KeyMsg) ?
 (cursor.blinkCanceled) {
 }
 (tea.KeyMsg) enter
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:14.76581489 +0545 +0545 m=+6.878125270,
+ Time: (time.Time) 2025-07-30 17:44:18.057817616 +0545 +0545 m=+5.262047012,
  tag: (int) 0,
  ID: (int) 1
 }
-(tea.KeyMsg) g
-(tea.KeyMsg) h
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:14.908897817 +0545 +0545 m=+7.021208194,
+ Time: (time.Time) 2025-07-30 17:44:18.200899465 +0545 +0545 m=+5.405128861,
  tag: (int) 1,
  ID: (int) 1
 }
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:15.052319707 +0545 +0545 m=+7.164630063,
+ Time: (time.Time) 2025-07-30 17:44:18.344575667 +0545 +0545 m=+5.548805064,
  tag: (int) 2,
- ID: (int) 1
-}
-(spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:15.196013087 +0545 +0545 m=+7.308323440,
- tag: (int) 3,
  ID: (int) 1
 }
 (cursor.BlinkMsg) {
  id: (int) 0,
- tag: (int) 36
+ tag: (int) 24
 }
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:15.340061378 +0545 +0545 m=+7.452371734,
+ Time: (time.Time) 2025-07-30 17:44:18.488375631 +0545 +0545 m=+5.692605037,
+ tag: (int) 3,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:18.631991296 +0545 +0545 m=+5.836220709,
  tag: (int) 4,
  ID: (int) 1
 }
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:15.48335198 +0545 +0545 m=+7.595662336,
+ Time: (time.Time) 2025-07-30 17:44:18.775810499 +0545 +0545 m=+5.980039895,
  tag: (int) 5,
  ID: (int) 1
 }
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:15.627133538 +0545 +0545 m=+7.739443925,
+ Time: (time.Time) 2025-07-30 17:44:18.919668822 +0545 +0545 m=+6.123898218,
  tag: (int) 6,
  ID: (int) 1
 }
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:15.77074621 +0545 +0545 m=+7.883056563,
+ Time: (time.Time) 2025-07-30 17:44:19.063123182 +0545 +0545 m=+6.267352578,
  tag: (int) 7,
  ID: (int) 1
 }
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:15.91435401 +0545 +0545 m=+8.026664386,
+ Time: (time.Time) 2025-07-30 17:44:19.20719305 +0545 +0545 m=+6.411422453,
  tag: (int) 8,
  ID: (int) 1
 }
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:16.058386099 +0545 +0545 m=+8.170696455,
+ Time: (time.Time) 2025-07-30 17:44:19.350543567 +0545 +0545 m=+6.554772963,
  tag: (int) 9,
  ID: (int) 1
 }
-(bubble.LLMreponseMsg) {
- response: (string) "",
-err: (*fmt.wrapError)(0xc000434580)(error calling GenerateContent: Error 503, Message: The model is overloaded. Please try again later., Status: UNAVAILABLE, Details: [])
-}
 (spinner.TickMsg) {
- Time: (time.Time) 2025-07-28 12:05:16.202313424 +0545 +0545 m=+8.314623777,
+ Time: (time.Time) 2025-07-30 17:44:19.494793226 +0545 +0545 m=+6.699022622,
  tag: (int) 10,
  ID: (int) 1
 }
-(tea.KeyMsg) ctrl+c
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:19.638789017 +0545 +0545 m=+6.843018414,
+ tag: (int) 11,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:19.781999178 +0545 +0545 m=+6.986228581,
+ tag: (int) 12,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:19.926069966 +0545 +0545 m=+7.130299360,
+ tag: (int) 13,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:20.070170931 +0545 +0545 m=+7.274400327,
+ tag: (int) 14,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:20.21336533 +0545 +0545 m=+7.417594726,
+ tag: (int) 15,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:20.357676267 +0545 +0545 m=+7.561905663,
+ tag: (int) 16,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:20.502036837 +0545 +0545 m=+7.706266233,
+ tag: (int) 17,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:20.646063127 +0545 +0545 m=+7.850292524,
+ tag: (int) 18,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:20.79013123 +0545 +0545 m=+7.994360633,
+ tag: (int) 19,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:20.933883109 +0545 +0545 m=+8.138112505,
+ tag: (int) 20,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:21.078084028 +0545 +0545 m=+8.282313424,
+ tag: (int) 21,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:21.221986678 +0545 +0545 m=+8.426216075,
+ tag: (int) 22,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:21.366186796 +0545 +0545 m=+8.570416223,
+ tag: (int) 23,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:21.5100936 +0545 +0545 m=+8.714322996,
+ tag: (int) 24,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:21.653854613 +0545 +0545 m=+8.858084010,
+ tag: (int) 25,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:21.797998593 +0545 +0545 m=+9.002227989,
+ tag: (int) 26,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:21.942015597 +0545 +0545 m=+9.146244994,
+ tag: (int) 27,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:22.085549132 +0545 +0545 m=+9.289778528,
+ tag: (int) 28,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:22.229809537 +0545 +0545 m=+9.434038937,
+ tag: (int) 29,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:22.373332497 +0545 +0545 m=+9.577561893,
+ tag: (int) 30,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:22.517470807 +0545 +0545 m=+9.721700204,
+ tag: (int) 31,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:22.660684928 +0545 +0545 m=+9.864914321,
+ tag: (int) 32,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:22.803914688 +0545 +0545 m=+10.008144085,
+ tag: (int) 33,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:22.948140734 +0545 +0545 m=+10.152370131,
+ tag: (int) 34,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:23.091672735 +0545 +0545 m=+10.295902131,
+ tag: (int) 35,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:23.235186681 +0545 +0545 m=+10.439416078,
+ tag: (int) 36,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:23.378495298 +0545 +0545 m=+10.582724694,
+ tag: (int) 37,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:23.522464973 +0545 +0545 m=+10.726694366,
+ tag: (int) 38,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:23.666091696 +0545 +0545 m=+10.870321093,
+ tag: (int) 39,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:23.809661821 +0545 +0545 m=+11.013891217,
+ tag: (int) 40,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:23.953350071 +0545 +0545 m=+11.157579468,
+ tag: (int) 41,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:24.097530845 +0545 +0545 m=+11.301760258,
+ tag: (int) 42,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:24.241061229 +0545 +0545 m=+11.445290625,
+ tag: (int) 43,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:24.384782559 +0545 +0545 m=+11.589011927,
+ tag: (int) 44,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:24.528602389 +0545 +0545 m=+11.732831761,
+ tag: (int) 45,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:24.672568265 +0545 +0545 m=+11.876797632,
+ tag: (int) 46,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:24.816451205 +0545 +0545 m=+12.020680601,
+ tag: (int) 47,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:24.960364555 +0545 +0545 m=+12.164593951,
+ tag: (int) 48,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:25.103895629 +0545 +0545 m=+12.308125026,
+ tag: (int) 49,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:25.247589313 +0545 +0545 m=+12.451818709,
+ tag: (int) 50,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:25.391395224 +0545 +0545 m=+12.595624690,
+ tag: (int) 51,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:25.535022121 +0545 +0545 m=+12.739251518,
+ tag: (int) 52,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:25.67926555 +0545 +0545 m=+12.883494946,
+ tag: (int) 53,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:25.822886759 +0545 +0545 m=+13.027116156,
+ tag: (int) 54,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:25.966411598 +0545 +0545 m=+13.170640994,
+ tag: (int) 55,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:26.110387049 +0545 +0545 m=+13.314616446,
+ tag: (int) 56,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:26.253940465 +0545 +0545 m=+13.458169885,
+ tag: (int) 57,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:26.397458366 +0545 +0545 m=+13.601687762,
+ tag: (int) 58,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:26.540869053 +0545 +0545 m=+13.745098449,
+ tag: (int) 59,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:26.685060588 +0545 +0545 m=+13.889290054,
+ tag: (int) 60,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:26.82904219 +0545 +0545 m=+14.033271607,
+ tag: (int) 61,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:26.972936542 +0545 +0545 m=+14.177165939,
+ tag: (int) 62,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:27.116521137 +0545 +0545 m=+14.320750540,
+ tag: (int) 63,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:27.260026551 +0545 +0545 m=+14.464255948,
+ tag: (int) 64,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:27.403270106 +0545 +0545 m=+14.607499503,
+ tag: (int) 65,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:27.547464768 +0545 +0545 m=+14.751694241,
+ tag: (int) 66,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:27.691512167 +0545 +0545 m=+14.895741563,
+ tag: (int) 67,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:27.835392261 +0545 +0545 m=+15.039621658,
+ tag: (int) 68,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:27.979595762 +0545 +0545 m=+15.183825162,
+ tag: (int) 69,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:28.123513325 +0545 +0545 m=+15.327742721,
+ tag: (int) 70,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:28.267224242 +0545 +0545 m=+15.471453642,
+ tag: (int) 71,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:28.410809007 +0545 +0545 m=+15.615038404,
+ tag: (int) 72,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:28.554446049 +0545 +0545 m=+15.758675446,
+ tag: (int) 73,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:28.698623335 +0545 +0545 m=+15.902852731,
+ tag: (int) 74,
+ ID: (int) 1
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:28.842383191 +0545 +0545 m=+16.046612587,
+ tag: (int) 75,
+ ID: (int) 1
+}
+(ui.LLMreponseMsg) {
+ response: (string) "",
+ err: (*fmt.wrapError)(0xc000256600)(error calling GenerateContent: Error 503, Message: The model is overloaded. Please try again later., Status: UNAVAILABLE, Details: [])
+}
+(spinner.TickMsg) {
+ Time: (time.Time) 2025-07-30 17:44:28.986534854 +0545 +0545 m=+16.190764251,
+ tag: (int) 76,
+ ID: (int) 1
+}

@@ -5,6 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spitfiregg/cerebro/internal/debug"
 	"github.com/spitfiregg/cerebro/internal/ui/states"
+	"github.com/spitfiregg/cerebro/internal/ui/styles"
 )
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -22,8 +23,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 		m.viewPort.Width = msg.Width
-		m.viewPort.Height = msg.Height - 6
-		m.textInput.Width = msg.Width - 4
+		m.viewPort.Height = msg.Height
+		m.textArea.SetWidth(msg.Width - 4)
 
 	case tea.KeyMsg:
 		if msg.String() == "ctrl+c" {
@@ -33,8 +34,10 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case window.ModelSelectedMsg:
 
 		m.selectedLLM = msg.ModelName
-		m.currentState = MainWindow // transition to the chat window
-		m.chat.AddSystemMessage("Model selected: " + msg.ModelName)
+		m.currentState = MainWindow
+
+		m.chat.AddSystemMessage(styles.SelectedModelStyle.Render(m.selectedLLM))
+
 		m.updateViewportContent()
 		m.viewPort.GotoBottom()
 		return m, textinput.Blink
@@ -83,12 +86,12 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			// Handle user input only when not thinking
 			if key, ok := msg.(tea.KeyMsg); ok && key.String() == "enter" {
-				if m.textInput.Value() != "" {
-					prompt := m.textInput.Value()
+				if m.textArea.Value() != "" {
+					prompt := m.textArea.Value()
 					m.isLLMthinking = true
 					m.chat.AddUserMessage(prompt)
 					m.updateViewportContent()
-					m.textInput.SetValue("")
+					m.textArea.Reset()
 
 					// start the spinner when we begin thinking
 					cmd = tea.Batch(
@@ -98,7 +101,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					cmds = append(cmds, cmd)
 				}
 			} else {
-				m.textInput, cmd = m.textInput.Update(msg)
+				m.textArea, cmd = m.textArea.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		}

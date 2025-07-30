@@ -2,11 +2,10 @@ package debug
 
 import (
 	"fmt"
-	"log"
-	"os"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/davecgh/go-spew/spew"
+	"log"
+	"os"
 )
 
 type Debug struct {

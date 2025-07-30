@@ -21,27 +21,34 @@ func (m Model) View() string {
 	case MainWindow:
 
 		placeholder := "Start a new conversation with Gemini..."
-		m.textInput.Placeholder = placeholder
+		m.textArea.Placeholder = placeholder
 
 		var status = lipgloss.NewStyle().Bold(true).Italic(true).Foreground(lipgloss.Color(styles.AntiFlashWhite)).Render("Gemini")
 		/* 			lipgloss.NewStyle().Bold(true).Underline(true).Background(lipgloss.Color(style.ImperialRed)).Foreground(lipgloss.Color(style.AntiFlashWhite)).Padding(0, 1, 0, 1).Render("Gemini") */
+
+		var promptStat string
 
 		if m.SpinnerModel.err != nil {
 			fmt.Println(m.SpinnerModel.err.Error())
 		}
 		if m.isLLMthinking {
+			promptStat = "Thinking"
 			status = fmt.Sprintf("%s%s", styles.ThinkingStyle.Render("Thinking"), m.spinner.View())
 			placeholder = "Wait for the reponse to end..."
-			m.textInput.Placeholder = placeholder
+			m.textArea.Placeholder = placeholder
+		} else {
+			promptStat = "Ready"
 		}
 
 		/* 		statusHeight := lipgloss.Height(status) */
 
-		inputAreaHeight := 1 + lipgloss.Height(m.textInput.View()) // 1 for status line, plus text input height
+		inputAreaHeight := 1 + lipgloss.Height(m.textArea.View()) // 1 for status line, plus text input height
 
 		m.viewPort.Height = m.height - inputAreaHeight - 2
 
-		promptBoxContent := status + "\n" + m.textInput.View()
+		statusBar := styles.StatusBarStyle.Render(fmt.Sprintf("• Model: %s • Status: %s • [Enter] Send • q/esc: Quit", m.selectedLLM, promptStat))
+
+		promptBoxContent := status + "\n" + m.textArea.View()
 		/* PromptBoxHeight := styles.InputStyle.Height(lipgloss.Height(promptBoxContent))
 		// init
 		promptBox := window.PromptBox{
@@ -51,7 +58,7 @@ func (m Model) View() string {
 
 		promptBox := styles.InputStyle.Width(m.width - 2).Height(lipgloss.Height(promptBoxContent)).Render(promptBoxContent)
 
-		ren := lipgloss.JoinVertical(lipgloss.Top, m.viewPort.View(), promptBox)
+		ren := lipgloss.JoinVertical(lipgloss.Center, m.viewPort.View(), promptBox, statusBar)
 		return ren
 
 	case SettingsWindow:

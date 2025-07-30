@@ -88,6 +88,22 @@ var (
 			Margin(0, 1, 1, 1).
 			Bold(true).
 			Align(lipgloss.Center)
+
+	SelectedModelStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color(AntiFlashWhite)).
+				Background(lipgloss.Color("#F35865")).
+				Padding(0, 1).
+				Margin(2, 1).
+				Bold(true).
+				Italic(false).
+				Align(lipgloss.Left)
+
+	TimeDisplayStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color(AntiFlashWhite)).
+				Background(lipgloss.Color("#F35865")).
+				Bold(true).
+				Italic(false).
+				Align(lipgloss.Right)
 )
 
 // Chat ui styles
@@ -128,11 +144,8 @@ var (
 				Foreground(TextPrimaryColor).Bold(true).Italic(true)
 
 	StatusBarStyle = lipgloss.NewStyle().
-			Background(BackgroundAccent).
-			Foreground(TextPrimaryColor).
-			Padding(0, 1).
-			Bold(true).
-			Width(100)
+			Padding(0, 1, 0, 1).
+			Italic(true)
 
 	ThinkingStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color(AntiFlashWhite)).
