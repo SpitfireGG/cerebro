@@ -41,12 +41,11 @@ func (m Model) View() string {
 		}
 
 		/* 		statusHeight := lipgloss.Height(status) */
-
 		inputAreaHeight := 1 + lipgloss.Height(m.textArea.View()) // 1 for status line, plus text input height
 
 		m.viewPort.Height = m.height - inputAreaHeight - 2
 
-		statusBar := styles.StatusBarStyle.Render(fmt.Sprintf("• Model: %s • Status: %s • [Enter] Send • q/esc: Quit", m.selectedLLM, promptStat))
+		statusBar := styles.StatusBarStyle.Render(fmt.Sprintf("• Model: %s • Status: %s • [Tab] Newline • [Enter] Send • q/esc: Quit", m.selectedLLM, promptStat))
 
 		promptBoxContent := status + "\n" + m.textArea.View()
 		/* PromptBoxHeight := styles.InputStyle.Height(lipgloss.Height(promptBoxContent))

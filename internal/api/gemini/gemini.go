@@ -6,16 +6,22 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
-	"strings"
-
 	"net/http"
 	"net/http/httputil"
+	"os"
+	"strings"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/spitfiregg/cerebro/internal/config"
 	"google.golang.org/genai"
 )
+
+type StreamChunk struct {
+	Content string
+	IsError bool
+	Error   error
+	IsEnd   bool
+}
 
 type LogTransport struct {
 	RoundTripper http.RoundTripper
@@ -86,7 +92,7 @@ func NewGeminiClient(apiKey string) (*genai.Client, error) {
 	return client, nil
 }
 
-func GenerateContent(api, prompt string) (string, error) {
+func GenerateContentStream(api, prompt string) (<-chan StreamChunk, error) {
 
 	ctx := context.Background()
 	client, _ := NewGeminiClient(api)
@@ -94,28 +100,70 @@ func GenerateContent(api, prompt string) (string, error) {
 
 	cfg := GenerateContentConfigFromGeminiConfig(&config.NewDefaultAppConfig().GeminiDefault)
 
-	response, err := client.Models.GenerateContent(ctx, model, genai.Text(prompt), cfg)
-	if err != nil {
-		return "", fmt.Errorf("error calling GenerateContent: %w", err)
-	}
-	defer client.ClientConfig().HTTPClient.CloseIdleConnections()
+	// create a buffered channel for non-blocking IO
+	chunkChan := make(chan StreamChunk, 10)
 
-	if len(response.Candidates) == 0 || response.Candidates == nil {
+	go func() {
+
+		defer close(chunkChan)
+		defer client.ClientConfig().HTTPClient.CloseIdleConnections()
+
+		response := client.Models.GenerateContentStream(ctx, model, genai.Text(prompt), cfg)
+
+		r, err := glamour.NewTermRenderer(
+
+			glamour.WithStandardStyle("dark"),
+			glamour.WithWordWrap(120),
+		)
+		if err != nil {
+			chunkChan <- StreamChunk{
+				IsError: true,
+				Error:   fmt.Errorf("Markdown render failed to init: %v", err),
+			}
+		}
+
+		for chunk, err := range response {
+			if err != nil {
+				chunkChan <- StreamChunk{
+					IsError: true,
+					Error:   fmt.Errorf("Markdown render failed to init: %v", err),
+				}
+			} else {
+				part := chunk.Candidates[0].Content.Parts[0]
+				rendredChunk, _ := r.Render(part.Text)
+				chunkChan <- StreamChunk{
+					IsError: false,
+					Content: rendredChunk,
+				}
+			}
+
+		}
+		chunkChan <- StreamChunk{IsEnd: true}
+
+	}()
+	return chunkChan, nil
+
+	/* if err != nil {
+		return "", fmt.Errorf("error calling GenerateContent: %w", err)
+	} */
+
+	/* if len(response.Candidates) == 0 || response.Candidates == nil {
 		// candiates are the differenct responses the LLM redponds with
 		// response.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
 		if response.PromptFeedback != nil && len(response.PromptFeedback.BlockReason) > 0 {
 			return "", fmt.Errorf("no response candidate found, bot was blocked due to violation: %v", response.PromptFeedback.BlockReason)
 		}
 		return "", fmt.Errorf("no response candidate found, issue with the model or something")
-	}
+	} */
 
-	var (
-		resp_rank   int = 0
-		botResponse strings.Builder
-		parts       []*genai.Part
-	)
-	parts = response.Candidates[resp_rank].Content.Parts
-	if len(parts) == 0 {
+	/* 	var ( */
+	/* 		resp_rank   int = 0 */
+	/* 		botResponse strings.Builder */
+	/* 		parts       []*genai.Part */
+	/* 	) */
+	/* 	parts = response.Candidates[resp_rank].Content.Parts */
+
+	/* if len(parts) == 0 {
 		return "empty content", nil
 
 	} else {
@@ -126,12 +174,35 @@ func GenerateContent(api, prompt string) (string, error) {
 				botResponse.WriteString(part.Text)
 			}
 		}
-	}
+	} */
+
 	// markdown response, seems pretty easy for small rendering , i should be making my own i guessss.................
-	r, _ := glamour.NewTermRenderer(
-		glamour.WithStandardStyle("dark"),
-		glamour.WithWordWrap(120),
-	)
-	renderedResponse, err := r.Render(botResponse.String())
-	return renderedResponse, nil
+	/* renderedResponse, err := r.Render(botResponse.String())
+	if err != nil {
+		fmt.Printf("got an error rendering the reponse: %v", err)
+	}
+	return renderedResponse, nil */
+}
+
+func GenerateContent(api, prompt string) (string, error) {
+
+	chunkChan, err := GenerateContentStream(api, prompt)
+	if err != nil {
+		return "", fmt.Errorf("error: %v", err)
+	}
+
+	var botResponse strings.Builder
+
+	for chunk := range chunkChan {
+		if chunk.IsError {
+			return "", chunk.Error
+		}
+		if chunk.IsEnd {
+			break
+		}
+
+		botResponse.WriteString(chunk.Content)
+	}
+	return botResponse.String(), nil
+
 }
