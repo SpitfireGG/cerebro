@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -11,55 +12,20 @@ import (
 	"github.com/spitfiregg/cerebro/internal/ui/styles"
 )
 
-// reposible for generating the reponse
-func (m *Model) GenerateReponse(prompt string) tea.Cmd {
-	return func() tea.Msg {
-		resp, err := api.GenerateContent(m.api_key, prompt)
-		return LLMreponseMsg{
-			response: resp,
-			err:      err,
-		}
-	}
-}
-
-const (
-	TitleConnectorLeft  = "┤"
-	TitleConnectorRight = "├"
-
-	TitleSimpleLeft  = "─"
-	TitleSimpleRight = "─"
-
-	TitleFancyLeft  = "┨"
-	TitleFancyRight = "┠"
-)
-
-/* func setPos(x, y int) {
-	fmt.Printf("\033[%d;%dH", y, x)
-
-} */
-
-func CreateStyledTitleLine(title string, totalWidth int) string {
-	borderStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#003153"))
-	titleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#c40000")).Bold(true)
-
-	if totalWidth < len(title)+2 {
-		return titleStyle.Render(title)
-	}
-
-	titleLen := len(title)
-	connectorChars := 2
-	availableSpace := totalWidth - titleLen - connectorChars
-
-	leftPadding := availableSpace / 2
-	rightPadding := availableSpace - leftPadding
-
-	leftLines := borderStyle.Render(strings.Repeat(styles.HLine, leftPadding))
-	rightLines := borderStyle.Render(strings.Repeat(styles.HLine, rightPadding))
-	leftConnector := borderStyle.Render(TitleConnectorLeft)
-	rightConnector := borderStyle.Render(TitleConnectorRight)
-	styledTitle := titleStyle.Render(title)
-
-	return leftLines + leftConnector + styledTitle + rightConnector + rightLines
+func (m *Model) StartStream(prompt string) tea.Cmd {
+	return tea.Sequence(
+		func() tea.Msg {
+			chunkChan, err := api.GenerateContentStream(m.api_key, prompt)
+			if err != nil {
+				return api.StreamChunk{IsError: true, Error: err}
+			}
+			m.streamChan = chunkChan
+			return api.StreamStartMsg{}
+		},
+		tea.Tick(time.Millisecond*100, func(time.Time) tea.Msg {
+			return api.PollStreamMsg{}
+		}),
+	)
 }
 
 // updateViewportContent method is responsible for updating the contents being displayed in
@@ -90,7 +56,7 @@ func (m *Model) updateViewportContent() {
 
 			// Create styled message ui based on role
 			var styledMessage string
-			var title string
+			/* var title string
 
 			switch msg.Role {
 			case chat.RoleUser:
@@ -99,27 +65,21 @@ func (m *Model) updateViewportContent() {
 				title = "Assistant"
 			case chat.RoleSystem:
 				title = "System"
-			}
+			} */
 
-			/* 			titleLen := len(titleHardcoded) */
-
-			// strings.Title is deprecated
-			/* 			roleLabel := styles.GetRoleStyle(string(msg.Role)).Render(strings.Title(string(msg.Role))) */
-			/* 			messageBubble := styles.GetMessageBubbleStyle(string(msg.Role)) */
 			msgContent := lipgloss.NewStyle().Foreground(lipgloss.Color(styles.AntiFlashWhite)).
 				Background(lipgloss.Color("#F35865")).
 				Bold(true).
 				Italic(false).
 				Align(lipgloss.Center)
 
-			titleLine := CreateStyledTitleLine(title, m.width)
+				/* 			titleLine := CreateStyledTitleLine(title, m.width) */
 
 			switch msg.Role {
 			case chat.RoleUser:
 
 				styledMessage = lipgloss.JoinVertical(
 					lipgloss.Center,
-					titleLine,
 					msgContent.Render(msg.Content),
 				)
 
@@ -131,13 +91,11 @@ func (m *Model) updateViewportContent() {
 				}
 				styledMessage = lipgloss.JoinVertical(
 					lipgloss.Left,
-					titleLine,
 					msgContent.Render(content))
 
 			case chat.RoleSystem:
 				styledMessage = lipgloss.JoinVertical(
 					lipgloss.Center,
-					titleLine,
 					msgContent.Render(msg.Content))
 
 			}
@@ -151,3 +109,44 @@ func (m *Model) updateViewportContent() {
 
 	m.viewPort.SetContent(content.String())
 }
+
+/*
+const (
+	TitleConnectorLeft  = "┤"
+	TitleConnectorRight = "├"
+
+	TitleSimpleLeft  = "─"
+	TitleSimpleRight = "─"
+
+	TitleFancyLeft  = "┨"
+	TitleFancyRight = "┠"
+)
+
+func setPos(x, y int) {
+	fmt.Printf("\033[%d;%dH", y, x)
+
+}
+
+func CreateStyledTitleLine(title string, totalWidth int) string {
+	borderStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#003153"))
+	titleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#c40000")).Bold(true)
+
+	if totalWidth < len(title)+2 {
+		return titleStyle.Render(title)
+	}
+
+	titleLen := len(title)
+	connectorChars := 2
+	availableSpace := totalWidth - titleLen - connectorChars
+
+	leftPadding := availableSpace / 2
+	rightPadding := availableSpace - leftPadding
+
+	leftLines := borderStyle.Render(strings.Repeat(styles.HLine, leftPadding))
+	rightLines := borderStyle.Render(strings.Repeat(styles.HLine, rightPadding))
+	leftConnector := borderStyle.Render(TitleConnectorLeft)
+	rightConnector := borderStyle.Render(TitleConnectorRight)
+	styledTitle := titleStyle.Render(title)
+
+	return leftLines + leftConnector + styledTitle + rightConnector + rightLines
+} */

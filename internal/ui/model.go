@@ -2,6 +2,7 @@ package ui
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -31,6 +32,11 @@ const (
 	MainWindow
 	SettingsWindow
 )
+
+type Key struct {
+	KeyHandlerChan chan (tea.KeyMsg)
+	KeyPressRecv   string
+}
 
 // define the main program state
 type UI struct {
@@ -64,6 +70,12 @@ type Model struct {
 	isLLMthinking bool
 	api_key       string
 
+	currentResponse strings.Builder
+	isStreaming     bool
+
+	// recieves a stream chunk from the StreamChunk channnel
+	streamChan <-chan api.StreamChunk
+
 	// for window selection
 	currentState      State
 	LLMSelectorWindow window.LLMmodel
@@ -74,6 +86,7 @@ type Model struct {
 	//embed the defined structs into the main Model
 	App
 	UI
+	Key
 	SpinnerModel
 	LLMreponseMsg
 	DebugModel
@@ -90,9 +103,8 @@ func TextInputHandler() textarea.Model {
 	textarea.Prompt = "┃ "
 	textarea.SetWidth(30)
 	textarea.SetHeight(3)
-
-	// Remove cursor line styling
-	textarea.FocusedStyle.CursorLine = lipgloss.NewStyle().Foreground(lipgloss.Color("#3a2b3c"))
+	textarea.Cursor.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#FE7743"))
+	textarea.Cursor.TextStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FEFFFF"))
 
 	textarea.ShowLineNumbers = false
 

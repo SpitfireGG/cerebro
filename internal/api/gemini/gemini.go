@@ -6,16 +6,28 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
-	"strings"
-
 	"net/http"
 	"net/http/httputil"
+	"os"
+	"strings"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/spitfiregg/cerebro/internal/config"
 	"google.golang.org/genai"
 )
+
+// StreamChunk holds content and other info from the Gemini client
+// Required to stream the incoming reponse from the client without blocking other operations
+type StreamChunk struct {
+	Content string
+	IsError bool
+	Error   error
+	IsEnd   bool
+}
+
+type StreamStartMsg struct{}
+type StreamEndMsg struct{}
+type PollStreamMsg struct{}
 
 type LogTransport struct {
 	RoundTripper http.RoundTripper
@@ -81,57 +93,136 @@ func NewGeminiClient(apiKey string) (*genai.Client, error) {
 		HTTPClient: httpClient,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Could not initialize a Gemini client")
+		return nil, fmt.Errorf("could not initialize a Gemini client")
 	}
 	return client, nil
 }
 
-func GenerateContent(api, prompt string) (string, error) {
+// Require a Producer and Consmer for the stream to flow between the Producer and Consmer thread
+
+// Producer
+func GenerateContentStream(api, prompt string) (<-chan StreamChunk, error) {
 
 	ctx := context.Background()
 	client, _ := NewGeminiClient(api)
-	model := NewDefaultAppConfig(api).GeminiDefault.GeminiConfig.Model
+	model := NewDefaultAppConfig(api).GeminiDefault.Model
 
 	cfg := GenerateContentConfigFromGeminiConfig(&config.NewDefaultAppConfig().GeminiDefault)
 
-	response, err := client.Models.GenerateContent(ctx, model, genai.Text(prompt), cfg)
-	if err != nil {
-		return "", fmt.Errorf("error calling GenerateContent: %w", err)
-	}
-	defer client.ClientConfig().HTTPClient.CloseIdleConnections()
+	// create a buffered channel for non-blocking IO
+	chunkChan := make(chan StreamChunk, 10)
 
-	if len(response.Candidates) == 0 || response.Candidates == nil {
-		// candiates are the differenct responses the LLM redponds with
-		// response.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
-		if response.PromptFeedback != nil && len(response.PromptFeedback.BlockReason) > 0 {
-			return "", fmt.Errorf("no response candidate found, bot was blocked due to violation: %v", response.PromptFeedback.BlockReason)
+	go func() {
+
+		defer close(chunkChan)
+		defer client.ClientConfig().HTTPClient.CloseIdleConnections()
+
+		response := client.Models.GenerateContentStream(ctx, model, genai.Text(prompt), cfg)
+
+		r, err := glamour.NewTermRenderer(
+
+			glamour.WithStandardStyle("dark"),
+			glamour.WithWordWrap(120),
+		)
+		if err != nil {
+			chunkChan <- StreamChunk{
+				IsError: true,
+				Error:   fmt.Errorf(" Markdown render failed to init: %v", err),
+			}
 		}
-		return "", fmt.Errorf("no response candidate found, issue with the model or something")
+
+		for chunk, err := range response {
+			if err != nil {
+				chunkChan <- StreamChunk{
+					IsError: true,
+					Error:   fmt.Errorf("reponse chunk iteration failed: %v", err),
+				}
+			} else {
+				part := chunk.Candidates[0].Content.Parts[0]
+				rendredChunk, _ := r.Render(part.Text)
+				chunkChan <- StreamChunk{
+					IsError: false,
+					Content: rendredChunk,
+				}
+			}
+
+		}
+		chunkChan <- StreamChunk{IsEnd: true}
+
+	}()
+	return chunkChan, nil
+
+}
+
+func GenerateContent(api, prompt string) (string, error) {
+
+	chunkChan, err := GenerateContentStream(api, prompt)
+	if err != nil {
+		return "", fmt.Errorf("error: %v", err)
 	}
 
+	var botResponse strings.Builder
+
+	for chunk := range chunkChan {
+		if chunk.IsError {
+			return "", chunk.Error
+		}
+		if chunk.IsEnd {
+			break
+		}
+
+		botResponse.WriteString(chunk.Content)
+	}
+	return botResponse.String(), nil
+
+}
+
+/*
+	if err != nil {
+			return "", fmt.Errorf("error calling GenerateContent: %w", err)
+		}
+*/
+
+/*
+	if len(response.Candidates) == 0 || response.Candidates == nil {
+			// candiates are the differenct responses the LLM redponds with
+			// response.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
+			if response.PromptFeedback != nil && len(response.PromptFeedback.BlockReason) > 0 {
+				return "", fmt.Errorf("no response candidate found, bot was blocked due to violation: %v", response.PromptFeedback.BlockReason)
+			}
+			return "", fmt.Errorf("no response candidate found, issue with the model or something")
+		}
+*/
+
+/*
 	var (
 		resp_rank   int = 0
 		botResponse strings.Builder
 		parts       []*genai.Part
 	)
 	parts = response.Candidates[resp_rank].Content.Parts
-	if len(parts) == 0 {
-		return "empty content", nil
+*/
 
-	} else {
-		for _, part := range parts {
-			if part.Thought {
-				botResponse.WriteString(part.Text)
-			} else {
-				botResponse.WriteString(part.Text)
+/*
+	if len(parts) == 0 {
+			return "empty content", nil
+
+		} else {
+			for _, part := range parts {
+				if part.Thought {
+					botResponse.WriteString(part.Text)
+				} else {
+					botResponse.WriteString(part.Text)
+				}
 			}
 		}
-	}
-	// markdown response, seems pretty easy for small rendering , i should be making my own i guessss.................
-	r, _ := glamour.NewTermRenderer(
-		glamour.WithStandardStyle("dark"),
-		glamour.WithWordWrap(120),
-	)
+*/
+
+// markdown response, seems pretty easy for small rendering , i should be making my own i guessss.................
+/*
 	renderedResponse, err := r.Render(botResponse.String())
-	return renderedResponse, nil
-}
+		if err != nil {
+			fmt.Printf("got an error rendering the reponse: %v", err)
+		}
+		return renderedResponse, nil
+*/

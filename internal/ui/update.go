@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	api "github.com/spitfiregg/cerebro/internal/api/gemini"
 	"github.com/spitfiregg/cerebro/internal/debug"
 	"github.com/spitfiregg/cerebro/internal/ui/states"
 	"github.com/spitfiregg/cerebro/internal/ui/styles"
@@ -10,7 +11,7 @@ import (
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	Dmodel := debug.Debug{
-		DumpFile: m.DebugModel.Dump,
+		DumpFile: m.Dump,
 	}
 	Dmodel.WriteLog(msg)
 
@@ -32,15 +33,20 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case window.ModelSelectedMsg:
-
 		m.selectedLLM = msg.ModelName
 		m.currentState = MainWindow
-
 		m.chat.AddSystemMessage(styles.SelectedModelStyle.Render(m.selectedLLM))
-
 		m.updateViewportContent()
 		m.viewPort.GotoBottom()
 		return m, textinput.Blink
+
+	case api.StreamStartMsg:
+		return m, nil
+
+	case api.PollStreamMsg:
+		if !m.isStreaming {
+			return m, nil
+		}
 
 	case LLMreponseMsg:
 		if m.currentState == MainWindow {
@@ -63,46 +69,52 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case ModelSelection:
-
 		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "esc" {
 			m.currentState = GreetWindow
 		}
 		var newTableModel tea.Model
 		newTableModel, cmd = m.LLMSelectorWindow.Update(msg)
-		m.LLMSelectorWindow = newTableModel.(window.LLMmodel)
+		if lm, ok := newTableModel.(window.LLMmodel); ok {
+			m.LLMSelectorWindow = lm
+		}
 		cmds = append(cmds, cmd)
 
 	case MainWindow:
 
-		// revert back to LLM selection window  on `esc`
+		var prompt string
 		if key, ok := msg.(tea.KeyMsg); ok && key.String() == "esc" {
 			m.currentState = ModelSelection
 		}
 
-		// Only update spinner when thinking
 		if m.isLLMthinking {
 			m.spinner, cmd = m.spinner.Update(msg)
 			cmds = append(cmds, cmd)
 		} else {
-			// Handle user input only when not thinking
-			if key, ok := msg.(tea.KeyMsg); ok && key.String() == "enter" {
-				if m.textArea.Value() != "" {
-					prompt := m.textArea.Value()
+
+			if key, ok := msg.(tea.KeyMsg); ok {
+
+				if key.String() == "shift enter" {
+					m.textArea.InsertString("\n")
+					m.textArea, cmd = m.textArea.Update(msg)
+					cmds = append(cmds, cmd)
+
+				} else if key.String() == "enter" && m.textArea.Value() != "" {
+
+					prompt = m.textArea.Value()
 					m.isLLMthinking = true
 					m.chat.AddUserMessage(prompt)
 					m.updateViewportContent()
 					m.textArea.Reset()
-
-					// start the spinner when we begin thinking
 					cmd = tea.Batch(
-						m.GenerateReponse(prompt),
+						m.StartStream(prompt),
 						m.spinner.Tick,
 					)
 					cmds = append(cmds, cmd)
+
+				} else {
+					m.textArea, cmd = m.textArea.Update(msg)
+					cmds = append(cmds, cmd)
 				}
-			} else {
-				m.textArea, cmd = m.textArea.Update(msg)
-				cmds = append(cmds, cmd)
 			}
 		}
 
