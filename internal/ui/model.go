@@ -2,6 +2,7 @@ package ui
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -68,6 +69,12 @@ type DebugModel struct {
 type Model struct {
 	isLLMthinking bool
 	api_key       string
+
+	currentResponse strings.Builder
+	isStreaming     bool
+
+	// recieves a stream chunk from the StreamChunk channnel
+	streamChan <-chan api.StreamChunk
 
 	// for window selection
 	currentState      State

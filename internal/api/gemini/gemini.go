@@ -16,12 +16,28 @@ import (
 	"google.golang.org/genai"
 )
 
+<<<<<<< HEAD
 type StreamChunk struct {
 	Content string
 	IsError bool
 	Error   error
 	IsEnd   bool
 }
+||||||| 4a36800
+=======
+// StreamChunk holds content and other info from the Gemini client
+// Required to stream the incoming reponse from the client without blocking other operations
+type StreamChunk struct {
+	Content string
+	IsError bool
+	Error   error
+	IsEnd   bool
+}
+
+type StreamStartMsg struct{}
+type StreamEndMsg struct{}
+type PollStreamMsg struct{}
+>>>>>>> recovered
 
 type LogTransport struct {
 	RoundTripper http.RoundTripper
@@ -87,16 +103,24 @@ func NewGeminiClient(apiKey string) (*genai.Client, error) {
 		HTTPClient: httpClient,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Could not initialize a Gemini client")
+		return nil, fmt.Errorf("could not initialize a Gemini client")
 	}
 	return client, nil
 }
 
+<<<<<<< HEAD
+||||||| 4a36800
+func GenerateContent(api, prompt string) (string, error) {
+=======
+// Require a Producer and Consmer for the stream to flow between the Producer and Consmer thread
+
+// Producer
+>>>>>>> recovered
 func GenerateContentStream(api, prompt string) (<-chan StreamChunk, error) {
 
 	ctx := context.Background()
 	client, _ := NewGeminiClient(api)
-	model := NewDefaultAppConfig(api).GeminiDefault.GeminiConfig.Model
+	model := NewDefaultAppConfig(api).GeminiDefault.Model
 
 	cfg := GenerateContentConfigFromGeminiConfig(&config.NewDefaultAppConfig().GeminiDefault)
 
@@ -118,6 +142,7 @@ func GenerateContentStream(api, prompt string) (<-chan StreamChunk, error) {
 		if err != nil {
 			chunkChan <- StreamChunk{
 				IsError: true,
+<<<<<<< HEAD
 				Error:   fmt.Errorf("Markdown render failed to init: %v", err),
 			}
 		}
@@ -152,10 +177,57 @@ func GenerateContentStream(api, prompt string) (<-chan StreamChunk, error) {
 		// response.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
 		if response.PromptFeedback != nil && len(response.PromptFeedback.BlockReason) > 0 {
 			return "", fmt.Errorf("no response candidate found, bot was blocked due to violation: %v", response.PromptFeedback.BlockReason)
+||||||| 4a36800
+	if len(response.Candidates) == 0 || response.Candidates == nil {
+		// candiates are the differenct responses the LLM redponds with
+		// response.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
+		if response.PromptFeedback != nil && len(response.PromptFeedback.BlockReason) > 0 {
+			return "", fmt.Errorf("no response candidate found, bot was blocked due to violation: %v", response.PromptFeedback.BlockReason)
+=======
+				Error:   fmt.Errorf(" Markdown render failed to init: %v", err),
+			}
+>>>>>>> recovered
 		}
+<<<<<<< HEAD
 		return "", fmt.Errorf("no response candidate found, issue with the model or something")
 	} */
+||||||| 4a36800
+		return "", fmt.Errorf("no response candidate found, issue with the model or something")
+	}
+=======
 
+		for chunk, err := range response {
+			if err != nil {
+				chunkChan <- StreamChunk{
+					IsError: true,
+					Error:   fmt.Errorf("reponse chunk iteration failed: %v", err),
+				}
+			} else {
+				part := chunk.Candidates[0].Content.Parts[0]
+				rendredChunk, _ := r.Render(part.Text)
+				chunkChan <- StreamChunk{
+					IsError: false,
+					Content: rendredChunk,
+				}
+			}
+
+		}
+		chunkChan <- StreamChunk{IsEnd: true}
+
+	}()
+	return chunkChan, nil
+
+}
+
+func GenerateContent(api, prompt string) (string, error) {
+
+	chunkChan, err := GenerateContentStream(api, prompt)
+	if err != nil {
+		return "", fmt.Errorf("error: %v", err)
+	}
+>>>>>>> recovered
+
+<<<<<<< HEAD
 	/* 	var ( */
 	/* 		resp_rank   int = 0 */
 	/* 		botResponse strings.Builder */
@@ -165,15 +237,73 @@ func GenerateContentStream(api, prompt string) (<-chan StreamChunk, error) {
 
 	/* if len(parts) == 0 {
 		return "empty content", nil
+||||||| 4a36800
+	var (
+		resp_rank   int = 0
+		botResponse strings.Builder
+		parts       []*genai.Part
+	)
+	parts = response.Candidates[resp_rank].Content.Parts
+	if len(parts) == 0 {
+		return "empty content", nil
+=======
+	var botResponse strings.Builder
 
-	} else {
-		for _, part := range parts {
-			if part.Thought {
-				botResponse.WriteString(part.Text)
-			} else {
-				botResponse.WriteString(part.Text)
+	for chunk := range chunkChan {
+		if chunk.IsError {
+			return "", chunk.Error
+		}
+		if chunk.IsEnd {
+			break
+		}
+
+		botResponse.WriteString(chunk.Content)
+	}
+	return botResponse.String(), nil
+
+}
+
+/*
+	if err != nil {
+			return "", fmt.Errorf("error calling GenerateContent: %w", err)
+		}
+*/
+
+/*
+	if len(response.Candidates) == 0 || response.Candidates == nil {
+			// candiates are the differenct responses the LLM redponds with
+			// response.PromptFeedback is recieved when any violation prompt is sent to the LLM is found, eg: pornographic or hacking questions or something
+			if response.PromptFeedback != nil && len(response.PromptFeedback.BlockReason) > 0 {
+				return "", fmt.Errorf("no response candidate found, bot was blocked due to violation: %v", response.PromptFeedback.BlockReason)
+			}
+			return "", fmt.Errorf("no response candidate found, issue with the model or something")
+		}
+*/
+
+/*
+	var (
+		resp_rank   int = 0
+		botResponse strings.Builder
+		parts       []*genai.Part
+	)
+	parts = response.Candidates[resp_rank].Content.Parts
+*/
+>>>>>>> recovered
+
+/*
+	if len(parts) == 0 {
+			return "empty content", nil
+
+		} else {
+			for _, part := range parts {
+				if part.Thought {
+					botResponse.WriteString(part.Text)
+				} else {
+					botResponse.WriteString(part.Text)
+				}
 			}
 		}
+<<<<<<< HEAD
 	} */
 
 	// markdown response, seems pretty easy for small rendering , i should be making my own i guessss.................
@@ -206,3 +336,25 @@ func GenerateContent(api, prompt string) (string, error) {
 	return botResponse.String(), nil
 
 }
+||||||| 4a36800
+	}
+	// markdown response, seems pretty easy for small rendering , i should be making my own i guessss.................
+	r, _ := glamour.NewTermRenderer(
+		glamour.WithStandardStyle("dark"),
+		glamour.WithWordWrap(120),
+	)
+	renderedResponse, err := r.Render(botResponse.String())
+	return renderedResponse, nil
+}
+=======
+*/
+
+// markdown response, seems pretty easy for small rendering , i should be making my own i guessss.................
+/*
+	renderedResponse, err := r.Render(botResponse.String())
+		if err != nil {
+			fmt.Printf("got an error rendering the reponse: %v", err)
+		}
+		return renderedResponse, nil
+*/
+>>>>>>> recovered
